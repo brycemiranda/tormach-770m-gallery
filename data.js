@@ -12,16 +12,27 @@
    automatic blueprint placeholder instead — handy while you're still
    collecting real photos.
 
+   SHARED MILL EQUIPMENT (440 + 770M)
+   -----------------------------------------------------------------------
+   The two mills stock mostly identical vises, TTS tool holders, and end
+   mills. That common set lives ONCE in COMMON_MILL_EQUIPMENT /
+   COMMON_MILL_ENDMILL_FAMILIES and is shown on BOTH machine pages
+   automatically — edit it once, both mills update. EQUIPMENT[machineId] /
+   ENDMILL_FAMILIES[machineId] are for EXTRAS one specific mill has that the
+   other doesn't (leave as [] if there's nothing extra).
+
    FLAT CATEGORIES (Workholding, Tool Holding, Measuring, Other, Chucks)
    -----------------------------------------------------------------------
-   Just add an object to the relevant array in EQUIPMENT[machineId][category].
+   Just add an object to the relevant array (COMMON_MILL_EQUIPMENT for
+   shared mill gear, EQUIPMENT[machineId] for machine-specific extras/lathe).
 
    DRILLDOWN CATEGORIES (End Mills, Turning Tools)
    -----------------------------------------------------------------------
    These use a step-wizard: Type -> Material -> Size (-> Flutes for mills).
-   Add a "family" (one Type+Material combo) to ENDMILL_FAMILIES /
-   TURNING_FAMILIES, and list every size/flute `variant` you actually stock
-   inside it. Each variant becomes one leaf item in the wizard.
+   Add a "family" (one Type+Material combo) to COMMON_MILL_ENDMILL_FAMILIES
+   (shared) / ENDMILL_FAMILIES[machineId] (mill-specific extra) /
+   TURNING_FAMILIES (lathe), and list every size/flute `variant` you
+   actually stock inside it. Each variant becomes one leaf item in the wizard.
    ========================================================================== */
 
 /* ---- Machines ------------------------------------------------------------ */
@@ -108,12 +119,13 @@ const CATEGORY_DEFS = {
   ],
 };
 
-/* ---- Flat-category equipment, per machine --------------------------------
-   Shape: EQUIPMENT[machineId][categoryId] = [ {id,name,code,tagline,photo,specs,notes,icon}, ... ]
+/* ---- Common mill equipment ------------------------------------------------
+   The 440 and 770M share almost all the same workholding, TTS tool holders,
+   and measuring gear. Put anything BOTH mills stock here — it automatically
+   shows up on both machine pages. Use EQUIPMENT["440"]/["770"] below ONLY
+   for equipment that machine has and the other doesn't.
    ========================================================================== */
-const EQUIPMENT = {
-  /* =========================== 770M =========================== */
-  "770": {
+const COMMON_MILL_EQUIPMENT = {
     workholding: [
       {
         id: "vise-standard",
@@ -287,86 +299,30 @@ const EQUIPMENT = {
           "Touches each tool off automatically to set its length offset. Place on the table, run the routine in PathPilot, then remove and store it before cutting. Never cut over it.",
       },
     ],
+};
+
+/* ---- Per-machine EXTRAS only ----------------------------------------------
+   Flat-category equipment that ONE specific machine has beyond the common
+   mill pool above (440/770), or the 8L's full equipment set (no common pool
+   needed — it's the only lathe). Shape:
+     EQUIPMENT[machineId][categoryId] = [ {id,name,code,tagline,photo,specs,notes,icon}, ... ]
+   Leave a machine's category as [] if it has nothing beyond the common set.
+   ========================================================================== */
+const EQUIPMENT = {
+  /* 770M has nothing beyond the common mill pool right now. */
+  "770": {
+    workholding: [],
+    toolholding: [],
+    measuring: [],
+    other: [],
   },
 
-  /* =========================== 440 ===========================
-     Placeholder starter set — edit specs/photos to match your actual crib. */
+  /* 440 has nothing beyond the common mill pool right now — add anything
+     that's 440-only here (e.g. a smaller vise unique to its table). */
   "440": {
-    workholding: [
-      {
-        id: "440-vise-standard",
-        name: "Standard Vise",
-        code: "WH-01",
-        icon: "vise",
-        photo: "",
-        tagline: "General-purpose milling vise (440-scale)",
-        specs: [
-          ["Type", "Fixed-jaw precision vise"],
-          ["Use", "Prismatic / flat stock"],
-          ["Note", "EDIT ME — confirm size/model"],
-        ],
-        notes: "Placeholder entry — swap in the real vise details and a photo for the 440's vise.",
-      },
-      {
-        id: "440-vise-small",
-        name: "Small Vise",
-        code: "WH-02",
-        icon: "vise",
-        photo: "",
-        tagline: "Compact vise for the 440's smaller table",
-        specs: [
-          ["Type", "Compact milling vise"],
-          ["Use", "Small parts"],
-          ["Note", "EDIT ME — confirm size/model"],
-        ],
-        notes: "Placeholder entry — update once confirmed.",
-      },
-    ],
-    toolholding: [
-      {
-        id: "440-tts-drill-chuck",
-        name: "TTS Drill Chuck",
-        code: "TH-01",
-        icon: "toolholder",
-        photo: "",
-        tagline: "Keyless chuck on a TTS shank",
-        specs: [
-          ["System", "TTS"],
-          ["Grip", "Keyless chuck"],
-          ["Use", "Twist drills"],
-        ],
-        notes: "Same TTS system as the 770 — placeholder, confirm the 440's actual holder set.",
-      },
-      {
-        id: "440-tts-er20",
-        name: "TTS ER20 Collet Holder",
-        code: "TH-02",
-        icon: "toolholder",
-        photo: "",
-        tagline: "Collet holder for round-shank tooling",
-        specs: [
-          ["System", "TTS"],
-          ["Collet", "ER20"],
-          ["Range", "~1/8\"–1/2\""],
-        ],
-        notes: "Placeholder — confirm collet range actually stocked for this machine.",
-      },
-    ],
-    measuring: [
-      {
-        id: "440-dial-indicator",
-        name: "Dial Indicator",
-        code: "ME-01",
-        icon: "measuring",
-        photo: "",
-        tagline: "Tramming & indicating",
-        specs: [
-          ["Reads", "0.001\" increments"],
-          ["Use", "Tram vise / indicate parts"],
-        ],
-        notes: "Placeholder — shared style with the 770's indicator.",
-      },
-    ],
+    workholding: [],
+    toolholding: [],
+    measuring: [],
     other: [],
   },
 
@@ -470,8 +426,12 @@ const EQUIPMENT = {
    facets order for mills: type -> material -> diameter -> flutes
    Each `variants` entry is one leaf item in the wizard. List only the
    sizes/flute-counts you actually stock.                                   */
-const ENDMILL_FAMILIES = {
-  "770": [
+/* ---- Common mill end mill families — shared by 440 + 770 ------------------
+   facets order for mills: type -> material -> diameter -> flutes
+   Each `variants` entry is one leaf item in the wizard. This is the shared
+   crib both mills stock from. Use ENDMILL_FAMILIES below only for a family
+   ONE specific mill has that the other doesn't.                            */
+const COMMON_MILL_ENDMILL_FAMILIES = [
     {
       type: "Flat",
       material: "HSS",
@@ -565,56 +525,14 @@ const ENDMILL_FAMILIES = {
         "Spin it, feed slowly into the edge until the tip kicks out concentric, then offset by the known tip radius. Lives with the end-mill / edge-finding kit.",
       variants: [{ diameter: "3/8\" body" }],
     },
-  ],
+];
 
-  /* 440 — smaller, edit to match actual crib */
-  "440": [
-    {
-      type: "Flat",
-      material: "HSS",
-      tagline: "Square-nose · slots, pockets, profiles",
-      icon: "endmill",
-      photo: "",
-      extraSpecs: [["Nose", "Square (flat)"]],
-      notes: "Placeholder set — confirm actual sizes stocked for the 440.",
-      variants: [
-        { diameter: "1/8\"", flutes: 2 },
-        { diameter: "1/4\"", flutes: 2 },
-        { diameter: "1/4\"", flutes: 4 },
-      ],
-    },
-    {
-      type: "Ball",
-      material: "HSS",
-      tagline: "Ball-nose · 3D & contoured surfaces",
-      icon: "endmill",
-      photo: "",
-      extraSpecs: [["Nose", "Ball (radiused)"]],
-      notes: "Placeholder set — confirm actual sizes stocked for the 440.",
-      variants: [
-        { diameter: "1/8\"", flutes: 2 },
-        { diameter: "1/4\"", flutes: 2 },
-      ],
-    },
-    {
-      type: "Center Drill",
-      material: "HSS",
-      tagline: "Spot-drill before drilling",
-      icon: "endmill",
-      photo: "",
-      notes: "Placeholder set — confirm actual sizes stocked for the 440.",
-      variants: [{ diameter: "#0" }, { diameter: "#1" }, { diameter: "#2" }],
-    },
-    {
-      type: "Edge Finder",
-      material: "Steel",
-      tagline: "Mechanical wiggler for X/Y zero",
-      icon: "endmill",
-      photo: "",
-      notes: "Placeholder set.",
-      variants: [{ diameter: "3/8\" body" }],
-    },
-  ],
+/* ---- Per-mill EXTRA end mill families --------------------------------------
+   Only families ONE specific mill has beyond the common pool above. Leave a
+   machine's array empty if it has nothing beyond the shared crib.          */
+const ENDMILL_FAMILIES = {
+  "770": [],
+  "440": [],
 };
 
 /* ---- Turning tool families — LATHE ONLY -----------------------------------

@@ -38,11 +38,27 @@ want the code on the 770 to skip the machine-select screen.
 - `styles.css` — industrial blueprint theme
 - `images/<machineId>/...` — real photos, organized per machine
 
+## Shared mill equipment (440 + 770M)
+
+The 440 and 770M stock mostly identical vises, TTS tool holders, and end
+mills, so that common set lives **once** in `COMMON_MILL_EQUIPMENT` /
+`COMMON_MILL_ENDMILL_FAMILIES` at the top of `data.js` and is shown on
+**both** machine pages automatically. Edit it once, both mills update —
+no more keeping two copies in sync.
+
+`EQUIPMENT["440"]` / `EQUIPMENT["770"]` (and `ENDMILL_FAMILIES["440"]` /
+`["770"]`) are only for **extras** — something one specific mill has that
+the other doesn't. Leave those as `[]` if there's nothing extra.
+
+The 8L Lathe doesn't need this — it's the only lathe, so its full
+equipment set just lives in `EQUIPMENT["8l"]` directly.
+
 ## Add / edit equipment (flat categories)
 
 Flat categories are: **Workholding** (and **Chucks & Workholding** for the
 lathe), **Tool Holding**, **Measuring**, **Other**. Open `data.js` and add an
-object to `EQUIPMENT["770"].workholding` (or whichever machine/category):
+object to `COMMON_MILL_EQUIPMENT.workholding` (shared by both mills) or
+`EQUIPMENT["440"].workholding` / `EQUIPMENT["8l"].chucks` (machine-specific):
 
 ```js
 {
@@ -60,7 +76,8 @@ object to `EQUIPMENT["770"].workholding` (or whichever machine/category):
 ## Add / edit End Mills or Turning Tools (the wizard categories)
 
 These are generated, not hand-listed one-by-one. In `data.js`, find
-`ENDMILL_FAMILIES` (mills) or `TURNING_FAMILIES` (lathe). Each **family** is
+`COMMON_MILL_ENDMILL_FAMILIES` (shared by both mills), `ENDMILL_FAMILIES`
+(mill-specific extras), or `TURNING_FAMILIES` (lathe). Each **family** is
 one Type + Material combo; list every size (and flute count, for end mills)
 you actually stock as a `variants` entry — each variant becomes one leaf item
 in the wizard:

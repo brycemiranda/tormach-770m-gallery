@@ -39,6 +39,20 @@ function imgSrc(machineId, photo) {
   return photo ? `images/${machineId}/${photo}` : null;
 }
 
+/* ---- shared-pool merge (440 + 770M pull from one common mill crib) ------ */
+function equipmentFor(machine, categoryId) {
+  const extras = EQUIPMENT[machine.id]?.[categoryId] || [];
+  const common = machine.type === "mill" ? COMMON_MILL_EQUIPMENT[categoryId] || [] : [];
+  return [...common, ...extras];
+}
+
+function familiesFor(machine, category) {
+  const extras = DATASETS[category.dataKey]?.[machine.id] || [];
+  const common =
+    machine.type === "mill" && category.id === "endmills" ? COMMON_MILL_ENDMILL_FAMILIES : [];
+  return [...common, ...extras];
+}
+
 /* ---- blueprint placeholder art ----------------------------------------- */
 const ICONS = {
   vise: `<path d="M14 44h72M22 44V26h24v18M50 44V30h20v14M22 26h24M30 20h8v6h-8z" fill="none"/><path d="M6 40h10v8H6zM84 40h10v8H84z" fill="none"/><path d="M16 44l4-4M84 44l-4-4" fill="none"/>`,
@@ -50,6 +64,8 @@ const ICONS = {
   lathe: `<path d="M8 60h84M16 60V44h14v16M70 60V38h18v22" fill="none"/><circle cx="70" cy="49" r="7" fill="none"/><path d="M30 44v-8h8v8" fill="none"/>`,
 };
 
+/* Keep these hex values in sync with the :root palette in styles.css —
+   data-URI SVGs can't read CSS variables from the host page. */
 function placeholderSVG(icon) {
   const glyph = ICONS[icon] || ICONS.misc;
   return (
@@ -58,12 +74,12 @@ function placeholderSVG(icon) {
       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
         <defs>
           <pattern id="g" width="10" height="10" patternUnits="userSpaceOnUse">
-            <path d="M10 0H0V10" fill="none" stroke="rgba(255,180,0,0.10)" stroke-width="0.5"/>
+            <circle cx="1" cy="1" r="1" fill="rgba(87,6,140,0.16)"/>
           </pattern>
         </defs>
-        <rect width="100" height="100" fill="#16181a"/>
+        <rect width="100" height="100" fill="#f4effa"/>
         <rect width="100" height="100" fill="url(#g)"/>
-        <g stroke="#ffb400" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">${glyph}</g>
+        <g stroke="#57068c" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">${glyph}</g>
       </svg>`
     )
   );
@@ -127,7 +143,7 @@ const CATEGORY_LABELS_FOR_FACET = {
 const DATASETS = { ENDMILL_FAMILIES, TURNING_FAMILIES };
 
 function drilldownItemsFor(machine, category) {
-  const families = DATASETS[category.dataKey]?.[machine.id] || [];
+  const families = familiesFor(machine, category);
   const facetKeys = category.facets.map((f) => f.key);
   return buildDrilldownItems(families, facetKeys);
 }
@@ -266,7 +282,7 @@ function renderMachineHub(machine) {
           .map((c, i) => {
             const count = c.facets
               ? drilldownItemsFor(machine, c).length
-              : (EQUIPMENT[machine.id]?.[c.id] || []).length;
+              : equipmentFor(machine, c.id).length;
             return `
             <a class="ccard" style="--i:${i}" href="#/m/${machine.id}/${c.id}">
               <div class="ccard__icon"><svg viewBox="0 0 100 100" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">${ICONS[c.icon]}</svg></div>
@@ -281,7 +297,7 @@ function renderMachineHub(machine) {
 
 /* ---- Flat category: grid + search -------------------------------------- */
 function renderFlatGrid(machine, category) {
-  const items = EQUIPMENT[machine.id]?.[category.id] || [];
+  const items = equipmentFor(machine, category.id);
 
   root.innerHTML = `
     <header class="hero hero--sub hero--tight">
@@ -341,7 +357,7 @@ function renderFlatGrid(machine, category) {
 }
 
 function renderFlatDetail(machine, category, itemId) {
-  const items = EQUIPMENT[machine.id]?.[category.id] || [];
+  const items = equipmentFor(machine, category.id);
   const item = items.find((it) => it.id === itemId);
   if (!item) return renderNotFound();
 
