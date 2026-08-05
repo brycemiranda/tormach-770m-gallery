@@ -1,41 +1,110 @@
-# Tormach 770M — Equipment & Peripherals
+# NYU Makerspace — CNC Equipment Catalog
 
-A single-page, scan-to-view catalog of the workholding, tooling, and measuring
-equipment available for the **Tormach 770M** at the NYU Makerspace. Someone
-scans the QR code on the machine → lands here → browses everything they can use,
-with specs and handling notes.
+A scan-to-view catalog covering three machines — **Tormach 440**, **Tormach
+770M**, and the **Tormach 8L Lathe**. Someone scans the QR code on a machine
+→ lands on that machine's page → drills into Workholding, Tool Holding,
+End Mills / Turning Tools, Measuring, or Other, with specs and handling
+notes for each piece of equipment.
 
-Pure static site (HTML/CSS/JS) — no build step, no framework.
+Pure static site (HTML/CSS/JS) — no build step, no framework, no bundler.
+
+## Navigation model
+
+```
+Home (pick a machine)
+ └─ Machine hub (category tiles, e.g. Tormach 770M)
+     ├─ Workholding / Tool Holding / Measuring / Other  → flat searchable grid → item detail
+     └─ End Mills / Turning Tools                        → step wizard:
+                                                             Type → Material → Size (→ Flutes)
+                                                             → resolved item detail
+```
+
+It's a hash-routed single-page app, so every screen has a real, shareable,
+bookmarkable URL and the browser back/forward buttons work normally. E.g.:
+
+- `#/m/770` — 770M machine hub
+- `#/m/770/workholding` — flat grid
+- `#/m/770/workholding/vise-smw` — item detail
+- `#/m/770/endmills/flat/hss/1-4in/4` — End Mills wizard, fully resolved
+- `#/m/8l/turningtools/parting/hss/1-16in-blade` — Turning Tools wizard, resolved
+
+You can point a QR code at any of these — e.g. straight at `#/m/770` if you
+want the code on the 770 to skip the machine-select screen.
 
 ## Files
-- `index.html` — page markup
+- `index.html` — thin shell; just mounts `<div id="app">` and loads the two scripts below
+- `data.js` — **all machines, categories, and equipment live here.** This is the only file you need to edit for content changes.
+- `app.js` — router + rendering logic. You shouldn't need to touch this to add equipment.
 - `styles.css` — industrial blueprint theme
-- `app.js` — **all equipment data lives here** (the `EQUIPMENT` array)
-- `images/` — drop real photos here
+- `images/<machineId>/...` — real photos, organized per machine
 
-## Add / edit equipment
-Open `app.js` and edit the `EQUIPMENT` array. Each item:
+## Add / edit equipment (flat categories)
+
+Flat categories are: **Workholding** (and **Chucks & Workholding** for the
+lathe), **Tool Holding**, **Measuring**, **Other**. Open `data.js` and add an
+object to `EQUIPMENT["770"].workholding` (or whichever machine/category):
 
 ```js
 {
   id: "vise-smw",
   name: "SMW Vise",
   code: "WH-02",
-  category: "Workholding",   // becomes a filter chip automatically
   icon: "vise",              // vise | toolholder | measuring | endmill | misc
-  photo: "",                 // "smw-vise.jpg" once you add the file to /images
+  photo: "",                 // "workholding/smw-vise.jpg" once added — see below
   tagline: "Saunders Machine Works modular vise",
   specs: [["Type", "Modular"], ["Use", "Repeatable fixturing"]],
   notes: "Handling / usage notes shown in the detail view.",
 }
 ```
 
-## Add real photos
-1. Put the image in `images/` (e.g. `images/smw-vise.jpg`).
-2. Set that item's `photo` to the filename.
-3. Until then, a blueprint placeholder is drawn automatically.
+## Add / edit End Mills or Turning Tools (the wizard categories)
 
-Landscape ~4:3 photos on a clean background look best.
+These are generated, not hand-listed one-by-one. In `data.js`, find
+`ENDMILL_FAMILIES` (mills) or `TURNING_FAMILIES` (lathe). Each **family** is
+one Type + Material combo; list every size (and flute count, for end mills)
+you actually stock as a `variants` entry — each variant becomes one leaf item
+in the wizard:
+
+```js
+{
+  type: "Flat",
+  material: "Carbide",
+  tagline: "Square-nose · faster feeds, harder materials",
+  photo: "",                 // one representative photo for the whole family
+  notes: "Handling notes shown on every size/flute variant of this family.",
+  variants: [
+    { diameter: "1/8\"", flutes: 2 },
+    { diameter: "1/4\"", flutes: 4 },
+  ],
+}
+```
+
+To add a brand-new **Type** (e.g. a chamfer mill), just add a new family
+object — it shows up as a new chip in Step 1 automatically. To add a new
+**size** to an existing type/material, just add another entry to `variants`.
+
+## Add a new machine
+
+1. Add an entry to `MACHINES` in `data.js` (id, name, type: `"mill"` or `"lathe"`, code, tagline, specs).
+2. Add its equipment under `EQUIPMENT["<your-id>"]` for each flat category (see `CATEGORY_DEFS` for which categories exist per machine type).
+3. If it's a mill, add `ENDMILL_FAMILIES["<your-id>"]`. If it's a lathe, add `TURNING_FAMILIES["<your-id>"]`.
+
+No changes to `app.js` needed — the router and UI are fully data-driven.
+
+## Add your own photos
+
+You mentioned pulling photos from Google/other sources — here's the exact drop-in process:
+
+1. Make (or use) a folder under `images/` for the machine: `images/770/`, `images/440/`, `images/8l/`.
+2. Inside it, organize by category if you like: `images/770/workholding/smw-vise.jpg`, `images/770/endmills/flat-hss.jpg`, etc. (Category subfolders are just a convention — any path works.)
+3. In `data.js`, set that item's (or family's) `photo` field to the path **relative to the machine's folder** — e.g. `photo: "workholding/smw-vise.jpg"`.
+4. Leave `photo: ""` and a blueprint placeholder icon is drawn automatically — handy while you're still collecting photos.
+
+Landscape ~4:3 photos on a plain background look best, and keep each file
+under ~500KB so the page stays fast on phones over makerspace wifi.
+
+For **End Mills / Turning Tools**, one photo per *family* (Type + Material) is
+usually enough — you don't need a separate photo for every diameter.
 
 ## Preview locally
 ```bash
@@ -43,18 +112,21 @@ cd tormach-770m-gallery
 python3 -m http.server 8000    # then open http://localhost:8000
 ```
 
-## Deploy to Vercel
-**Easiest (dashboard):** push this folder to a GitHub repo → import it at
-[vercel.com/new](https://vercel.com/new) → deploy. No settings needed (it's static).
+## Deploy
 
-**CLI:**
+This repo is already connected to GitHub
+(`github.com/brycemiranda/tormach-770m-gallery`) and deployed on Vercel.
+Vercel auto-redeploys on every push to `main`:
+
 ```bash
-npm i -g vercel
-cd tormach-770m-gallery
-vercel            # first run links/creates the project
-vercel --prod     # promote to your public URL
+git add -A
+git commit -m "Add equipment photos"
+git push
 ```
 
+No Vercel settings are needed — it's a static site with no build step.
+
 ## Make the QR code
-After deploying, take your `https://….vercel.app` URL and generate a QR code
-(e.g. qr-code-generator.com or `qrencode`). Print it on the machine poster.
+Take your live `.vercel.app` URL (optionally with a `#/m/770`-style deep
+link) and generate a QR code (e.g. qr-code-generator.com or `qrencode`).
+Print it on the machine poster.

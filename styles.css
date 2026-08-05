@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Tormach 770M — Equipment catalog · industrial blueprint theme
+   NYU Makerspace — CNC Equipment Catalog · industrial blueprint theme
    ========================================================================== */
 :root {
   --bg: #101113;
@@ -16,6 +16,8 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
+
+a { color: inherit; text-decoration: none; }
 
 body {
   background: var(--bg);
@@ -35,10 +37,21 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-/* ---- Hero ---------------------------------------------------------------- */
-.hero {
-  max-width: 1180px; margin: 0 auto; padding: 22px 24px 12px;
+.page { max-width: 1180px; margin: 0 auto; padding: 0 24px 60px; }
+
+/* ---- Breadcrumbs ----------------------------------------------------------- */
+.crumbs {
+  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  font-size: 11px; letter-spacing: 0.1em; color: var(--muted);
+  padding: 18px 0 6px;
 }
+.crumbs a:hover { color: var(--amber); }
+.crumbs__sep { color: var(--line); margin: 0 2px; }
+.crumbs__here { color: var(--amber); }
+
+/* ---- Hero ---------------------------------------------------------------- */
+.hero { max-width: 1180px; margin: 0 auto; padding: 22px 24px 12px; }
+.hero--tight { padding-bottom: 4px; }
 .hero__bar {
   display: flex; justify-content: space-between; align-items: center;
   font-size: 11px; letter-spacing: 0.22em; color: var(--muted);
@@ -56,6 +69,7 @@ body {
 }
 
 .hero__main { padding: 30px 0 22px; }
+.hero__main--sub { padding: 10px 0 18px; }
 .hero__eyebrow {
   font-size: 12px; letter-spacing: 0.35em; color: var(--amber); margin-bottom: 12px;
 }
@@ -68,22 +82,26 @@ body {
   color: var(--bg); -webkit-text-stroke: 1.5px var(--amber);
   paint-order: stroke fill;
 }
+.h1--sub { font-size: clamp(36px, 7vw, 64px); }
+.h1--cat {
+  font-family: var(--disp); font-weight: 900; font-size: clamp(28px, 5vw, 46px);
+  text-transform: uppercase; letter-spacing: -0.01em; margin: 4px 0 18px;
+}
 .hero__sub { max-width: 620px; margin-top: 20px; color: var(--muted); font-size: 14px; }
 
 .hero__meta {
-  display: flex; gap: 26px; flex-wrap: wrap; padding: 16px 0 0;
-  border-top: 1px solid var(--line); margin-top: 22px;
-  font-size: 11px; letter-spacing: 0.2em; color: var(--muted);
+  display: flex; gap: 26px; flex-wrap: wrap; padding: 16px 24px;
+  max-width: 1180px; margin: 0 auto; border-top: 1px solid var(--line);
+  font-size: 11px; letter-spacing: 0.14em; color: var(--muted);
 }
-.hero__meta #count { margin-left: auto; color: var(--amber); }
+.hero__meta b { color: var(--ink); font-weight: 600; letter-spacing: 0; }
 
 /* ---- Controls ------------------------------------------------------------ */
 .controls {
-  max-width: 1180px; margin: 0 auto; padding: 18px 24px;
+  max-width: 1180px; margin: 0 auto; padding: 18px 0;
   display: flex; gap: 16px; flex-wrap: wrap; align-items: center;
-  position: sticky; top: 0; z-index: 20;
-  background: linear-gradient(var(--bg) 70%, transparent);
 }
+.controls--static { position: static; background: none; }
 .search {
   display: flex; align-items: center; gap: 10px; flex: 1; min-width: 220px;
   background: var(--panel); border: 1px solid var(--line);
@@ -101,19 +119,59 @@ body {
   font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em;
   color: var(--muted); background: var(--panel); border: 1px solid var(--line);
   border-radius: var(--radius); padding: 9px 14px; cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.15s ease; display: inline-block;
 }
 .chip:hover { color: var(--ink); border-color: var(--amber-dim); }
 .chip--on { color: var(--bg); background: var(--amber); border-color: var(--amber); font-weight: 600; }
+.chip--lg { padding: 14px 22px; font-size: 14px; border-radius: 6px; }
+.chip--lg:hover { color: var(--bg); background: var(--amber); border-color: var(--amber); }
 
-/* ---- Grid ---------------------------------------------------------------- */
+/* ---- Machine cards (home) -------------------------------------------------- */
+.mgrid {
+  display: grid; gap: 20px; padding-top: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+.mcard {
+  display: block; background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); overflow: hidden;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+  animation: rise 0.5s both; animation-delay: calc(var(--i) * 70ms);
+}
+.mcard:hover {
+  transform: translateY(-5px); border-color: var(--amber);
+  box-shadow: 0 14px 34px -16px rgba(0,0,0,0.75), 0 0 0 1px var(--amber-dim);
+}
+.mcard__img { position: relative; aspect-ratio: 16 / 10; background: var(--bg-2); }
+.mcard__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mcard__body { padding: 18px 20px 22px; }
+.mcard__body h2 { font-family: var(--disp); font-weight: 800; font-size: 24px; letter-spacing: -0.01em; }
+.mcard__body p { color: var(--muted); font-size: 13px; margin-top: 6px; }
+
+/* ---- Category cards (machine hub) ------------------------------------------ */
+.cgrid {
+  display: grid; gap: 14px; padding-top: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+.ccard {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 20px 18px; transition: all 0.18s ease;
+  animation: rise 0.45s both; animation-delay: calc(var(--i) * 60ms);
+}
+.ccard:hover { border-color: var(--amber); transform: translateY(-3px); box-shadow: 0 10px 26px -14px rgba(0,0,0,0.7); }
+.ccard__icon { width: 40px; height: 40px; color: var(--amber); }
+.ccard__icon svg { width: 100%; height: 100%; }
+.ccard h3 { font-family: var(--disp); font-weight: 700; font-size: 17px; }
+.ccard__count { font-size: 11px; letter-spacing: 0.1em; color: var(--muted); }
+
+/* ---- Grid (equipment cards) ------------------------------------------------ */
 .grid {
-  max-width: 1180px; margin: 0 auto; padding: 12px 24px 60px;
+  padding: 12px 0 40px;
   display: grid; gap: 16px;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
 }
 .card {
-  background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+  display: block; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
   overflow: hidden; cursor: pointer; outline: none;
   transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
   animation: rise 0.5s both; animation-delay: calc(var(--i) * 45ms);
@@ -136,6 +194,15 @@ body {
 .card__name { font-family: var(--disp); font-weight: 700; font-size: 19px; margin: 7px 0 5px; letter-spacing: -0.01em; }
 .card__tag { font-size: 12px; color: var(--muted); }
 .empty { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 60px 0; }
+.empty a { color: var(--amber); }
+
+/* ---- Wizard (End Mills / Turning Tools) ------------------------------------ */
+.wizard { padding-top: 6px; }
+.wizard__step {
+  font-size: 11px; letter-spacing: 0.2em; color: var(--amber); margin-bottom: 18px;
+}
+.wizard__chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.wizard__count { margin-top: 22px; font-size: 12px; color: var(--muted); }
 
 /* ---- Footer -------------------------------------------------------------- */
 .foot {
@@ -144,31 +211,17 @@ body {
   flex-wrap: wrap; gap: 10px; font-size: 11px; letter-spacing: 0.06em; color: var(--muted);
 }
 
-/* ---- Modal --------------------------------------------------------------- */
-.modal {
-  position: fixed; inset: 0; z-index: 100; display: none;
-  align-items: center; justify-content: center; padding: 20px;
-  background: rgba(8, 9, 10, 0.8); backdrop-filter: blur(6px);
-}
-.modal.open { display: flex; animation: fade 0.2s ease; }
-@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-.modal__panel {
-  position: relative; width: min(880px, 100%); max-height: 90vh; overflow: auto;
+/* ---- Detail panel (inline, not a modal) ------------------------------------ */
+.detail {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
   background: var(--panel); border: 1px solid var(--amber-dim); border-radius: var(--radius);
-  animation: pop 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden; animation: pop 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }
-@keyframes pop { from { transform: translateY(20px) scale(0.98); opacity: 0; } to { transform: none; opacity: 1; } }
-.modal__close {
-  position: absolute; top: 12px; right: 12px; z-index: 2;
-  width: 34px; height: 34px; border: 1px solid var(--line); border-radius: var(--radius);
-  background: rgba(16,17,19,0.7); color: var(--ink); cursor: pointer; font-size: 14px;
-}
-.modal__close:hover { border-color: var(--amber); color: var(--amber); }
-.modal__grid { display: grid; grid-template-columns: 1fr 1fr; }
-.modal__img { position: relative; background: var(--bg-2); aspect-ratio: 1; }
-.modal__img img { width: 100%; height: 100%; object-fit: cover; }
-.modal__info { padding: 34px 30px; }
-.modal__info h2 { font-family: var(--disp); font-weight: 900; font-size: 32px; letter-spacing: -0.02em; margin: 8px 0 6px; line-height: 1.02; }
+@keyframes pop { from { transform: translateY(14px) scale(0.99); opacity: 0; } to { transform: none; opacity: 1; } }
+.detail__img { position: relative; background: var(--bg-2); aspect-ratio: 1; }
+.detail__img img { width: 100%; height: 100%; object-fit: cover; }
+.detail__info { padding: 34px 30px; }
+.detail__info h2 { font-family: var(--disp); font-weight: 900; font-size: 32px; letter-spacing: -0.02em; margin: 8px 0 6px; line-height: 1.02; }
 .modal__tag { color: var(--muted); font-size: 13px; margin-bottom: 22px; }
 .spec { border-top: 1px solid var(--line); margin-bottom: 22px; }
 .spec > div { display: flex; justify-content: space-between; gap: 16px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
@@ -177,7 +230,7 @@ body {
 .modal__notes { font-size: 13.5px; color: #c7c9cc; line-height: 1.6; }
 
 @media (max-width: 640px) {
-  .modal__grid { grid-template-columns: 1fr; }
-  .modal__img { aspect-ratio: 16 / 10; }
+  .detail { grid-template-columns: 1fr; }
+  .detail__img { aspect-ratio: 16 / 10; }
   .hero__meta { gap: 16px; }
 }
