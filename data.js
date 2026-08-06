@@ -305,7 +305,7 @@ const COMMON_MILL_EQUIPMENT = {
         name: "TTS Drill Chuck (1/4\")",
         code: "TH-01",
         icon: "toolholder",
-        photo: "",
+        photo: "toolholding/tts-drill-chuck.webp",
         tagline: "Keyless chuck on a TTS shank",
         specs: [
           ["System", "TTS (Tormach Tooling System)"],
