@@ -131,6 +131,7 @@ function buildDrilldownItems(families, facetKeys) {
         facets,
         icon: fam.icon,
         photo: fam.photo,
+        guide: fam.guide,
         _shared: fam._shared,
         name: nameParts.join(" · "),
         tagline: fam.tagline,
@@ -588,6 +589,17 @@ function renderFlatDetail(machine, category, itemId) {
     </div>`;
 }
 
+/* Optional per-item/family `guide` field: a URL to a tutorial, user guide,
+   or how-to video. Renders nothing when absent, so it's fully opt-in. */
+function guideButton(url) {
+  if (!url) return "";
+  return `
+    <a class="guidebtn" href="${escAttr(url)}" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+      How to Use
+    </a>`;
+}
+
 function detailPanel(machine, item, categoryLabel) {
   return `
     <div class="detail">
@@ -599,6 +611,7 @@ function detailPanel(machine, item, categoryLabel) {
         <span class="card__cat">${categoryLabel}</span>
         <h2>${item.name}</h2>
         <p class="modal__tag">${item.tagline}</p>
+        ${guideButton(item.guide)}
         <dl class="spec">
           ${item.specs.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}
         </dl>
@@ -736,6 +749,7 @@ function renderFacetBrowser(machine, category) {
             <div class="fgroup__body">
               <h3>${formatFacetValue(facetKeys[0], sample.facets[facetKeys[0]])} · ${formatFacetValue(facetKeys[1], sample.facets[facetKeys[1]])}</h3>
               <p class="fgroup__tag">${sample.tagline}</p>
+              ${guideButton(sample.guide)}
               <div class="fgroup__badges">${badges}</div>
               <p class="fgroup__notes">${sample.notes}</p>
             </div>

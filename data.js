@@ -12,6 +12,14 @@
    automatic blueprint placeholder instead — handy while you're still
    collecting real photos.
 
+   HOW-TO LINKS
+   ------------
+   Add an optional `guide: "https://..."` field to any item (or End Mill/
+   Turning Tool family) to link a tutorial, user guide, or video. A
+   "How to Use" button appears on its detail page automatically — omit the
+   field (or leave it unset) and no button shows. No default/example value;
+   only add real, working URLs.
+
    SHARED MILL EQUIPMENT (440 + 770M)
    -----------------------------------------------------------------------
    The two mills stock mostly identical vises, TTS tool holders, and end

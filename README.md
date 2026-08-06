@@ -67,6 +67,7 @@ object to `COMMON_MILL_EQUIPMENT.workholding` (shared by both mills) or
   code: "WH-02",
   icon: "vise",              // vise | toolholder | measuring | endmill | misc
   photo: "",                 // "workholding/smw-vise.jpg" once added — see below
+  guide: "",                 // optional: a tutorial/user-guide/video URL — shows a "How to Use" button when set
   tagline: "Saunders Machine Works modular vise",
   specs: [["Type", "Modular"], ["Use", "Repeatable fixturing"]],
   notes: "Handling / usage notes shown in the detail view.",
