@@ -153,6 +153,40 @@ function formatFacetValue(key, val) {
   return String(val);
 }
 
+/* ---- Global search index (built once, used on the home page) ----------- */
+let _searchIndex = null;
+function searchIndex() {
+  if (_searchIndex) return _searchIndex;
+  const rows = [];
+  MACHINES.forEach((machine) => {
+    categoriesFor(machine).forEach((category) => {
+      if (category.facets) {
+        const facetKeys = category.facets.map((f) => f.key);
+        drilldownItemsFor(machine, category).forEach((item) => {
+          const path = facetKeys.map((k) => slugify(item.facets[k] || "")).join("/");
+          rows.push({
+            machine,
+            category,
+            item,
+            href: `#/m/${machine.id}/${category.id}/${path}`,
+          });
+        });
+      } else {
+        equipmentFor(machine, category.id).forEach((item) => {
+          rows.push({
+            machine,
+            category,
+            item,
+            href: `#/m/${machine.id}/${category.id}/${item.id}`,
+          });
+        });
+      }
+    });
+  });
+  _searchIndex = rows;
+  return rows;
+}
+
 function itemMatchesSelections(item, facetKeys, selections) {
   for (let i = 0; i < selections.length; i++) {
     if (slugify(item.facets[facetKeys[i]] || "") !== selections[i]) return false;
@@ -261,26 +295,82 @@ function renderHome() {
       </div>
     </header>
     <div class="page">
-      <div class="mgrid">
-        ${MACHINES.map(
-          (m, i) => `
-          <a class="mcard" style="--i:${i}" href="#/m/${m.id}">
-            <div class="mcard__img">
-              ${imgTag(m.id, m.photo, m.type, m.name)}
-              <span class="card__code">${m.code}</span>
-            </div>
-            <div class="mcard__body">
-              <h2>${m.name}</h2>
-              <p>${m.tagline}</p>
-            </div>
-          </a>`
-        ).join("")}
+      <div class="controls controls--static">
+        <div class="search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="home-search" type="search" placeholder="Search all equipment across every machine…" autocomplete="off" />
+        </div>
+      </div>
+      <div id="home-results"></div>
+      <div id="mgrid-wrap">
+        <div class="mgrid">
+          ${MACHINES.map(
+            (m, i) => `
+            <a class="mcard" style="--i:${i}" href="#/m/${m.id}">
+              <div class="mcard__img">
+                ${imgTag(m.id, m.photo, m.type, m.name)}
+                <span class="card__code">${m.code}</span>
+              </div>
+              <div class="mcard__body">
+                <h2>${m.name}</h2>
+                <p>${m.tagline}</p>
+              </div>
+            </a>`
+          ).join("")}
+        </div>
       </div>
     </div>
     <footer class="foot">
       <span>NYU Makerspace · CNC equipment catalog</span>
       <span>Return all tooling to its labeled home · Report damage to the CNC grad assistant</span>
     </footer>`;
+
+  const input = document.getElementById("home-search");
+  const results = document.getElementById("home-results");
+  const mgridWrap = document.getElementById("mgrid-wrap");
+
+  input.addEventListener("input", (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    if (!q) {
+      results.innerHTML = "";
+      mgridWrap.style.display = "";
+      return;
+    }
+    mgridWrap.style.display = "none";
+
+    const matches = searchIndex().filter((row) =>
+      [row.item.name, row.item.tagline, row.item.notes, row.machine.name, row.category.label]
+        .join(" ")
+        .toLowerCase()
+        .includes(q)
+    );
+
+    if (!matches.length) {
+      results.innerHTML = `<p class="empty">No equipment matches “${e.target.value}”.</p>`;
+      return;
+    }
+
+    results.innerHTML = `
+      <div class="grid">
+        ${matches
+          .slice(0, 60)
+          .map(
+            (row, i) => `
+          <a class="card" style="--i:${i}" href="${row.href}">
+            <div class="card__img">
+              ${imgTag(row.machine.id, row.item.photo, row.item.icon, row.item.name)}
+              <span class="card__code">${row.item.code || ""}</span>
+            </div>
+            <div class="card__body">
+              <span class="card__cat">${row.machine.name} · ${row.category.label}</span>
+              <h3 class="card__name">${row.item.name}</h3>
+              <p class="card__tag">${row.item.tagline}</p>
+            </div>
+          </a>`
+          )
+          .join("")}
+      </div>`;
+  });
 }
 
 function renderMachineHub(machine) {
