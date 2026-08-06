@@ -35,22 +35,38 @@ function categoryById(machine, catId) {
   return categoriesFor(machine).find((c) => c.id === catId);
 }
 
-function imgSrc(machineId, photo) {
-  return photo ? `images/${machineId}/${photo}` : null;
+/* Common (shared-pool) equipment photos live under images/common/... — one
+   file works for every machine that stocks it — instead of images/<machineId>/...
+   which is only correct for that one machine's own extras. `ns` is that
+   folder namespace: "common" or a specific machine id. */
+function imgSrc(ns, photo) {
+  return photo ? `images/${ns}/${photo}` : null;
 }
 
-/* ---- shared-pool merge (440 + 770M pull from one common mill crib) ------ */
+/* ---- shared-pool merge (440 + 770M pull from one common mill crib) ------
+   Items/families from the common pool are tagged _shared:true so image
+   lookups and anything else that cares can tell them apart from a specific
+   machine's own extras. */
 function equipmentFor(machine, categoryId) {
-  const extras = EQUIPMENT[machine.id]?.[categoryId] || [];
-  const common = machine.type === "mill" ? COMMON_MILL_EQUIPMENT[categoryId] || [] : [];
+  const extras = (EQUIPMENT[machine.id]?.[categoryId] || []).map((it) => ({ ...it, _shared: false }));
+  const common =
+    machine.type === "mill"
+      ? (COMMON_MILL_EQUIPMENT[categoryId] || []).map((it) => ({ ...it, _shared: true }))
+      : [];
   return [...common, ...extras];
 }
 
 function familiesFor(machine, category) {
-  const extras = DATASETS[category.dataKey]?.[machine.id] || [];
+  const extras = (DATASETS[category.dataKey]?.[machine.id] || []).map((f) => ({ ...f, _shared: false }));
   const common =
-    machine.type === "mill" && category.id === "endmills" ? COMMON_MILL_ENDMILL_FAMILIES : [];
+    machine.type === "mill" && category.id === "endmills"
+      ? COMMON_MILL_ENDMILL_FAMILIES.map((f) => ({ ...f, _shared: true }))
+      : [];
   return [...common, ...extras];
+}
+
+function imgNamespace(machine, item) {
+  return item._shared ? "common" : machine.id;
 }
 
 /* ---- blueprint placeholder art ----------------------------------------- */
@@ -115,6 +131,7 @@ function buildDrilldownItems(families, facetKeys) {
         facets,
         icon: fam.icon,
         photo: fam.photo,
+        _shared: fam._shared,
         name: nameParts.join(" · "),
         tagline: fam.tagline,
         specs: [
@@ -392,7 +409,7 @@ function renderHome(initialQuery) {
             (row, i) => `
           <a class="card" style="--i:${i}" href="${row.href}">
             <div class="card__img">
-              ${imgTag(row.machine.id, row.item.photo, row.item.icon, row.item.name)}
+              ${imgTag(imgNamespace(row.machine, row.item), row.item.photo, row.item.icon, row.item.name)}
               <span class="card__code">${row.item.code || ""}</span>
             </div>
             <div class="card__body">
@@ -540,7 +557,7 @@ function renderFlatGrid(machine, category) {
         (it, i) => `
       <a class="card" style="--i:${i}" href="#/m/${machine.id}/${category.id}/${it.id}">
         <div class="card__img">
-          ${imgTag(machine.id, it.photo, it.icon, it.name)}
+          ${imgTag(imgNamespace(machine, it), it.photo, it.icon, it.name)}
           <span class="card__code">${it.code}</span>
         </div>
         <div class="card__body">
@@ -581,7 +598,7 @@ function detailPanel(machine, item, categoryLabel) {
   return `
     <div class="detail">
       <div class="detail__img">
-        ${imgTag(machine.id, item.photo, item.icon, item.name)}
+        ${imgTag(imgNamespace(machine, item), item.photo, item.icon, item.name)}
         <span class="card__code">${item.code || ""}</span>
       </div>
       <div class="detail__info">

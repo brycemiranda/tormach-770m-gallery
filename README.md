@@ -110,15 +110,18 @@ No changes to `app.js` needed — the router and UI are fully data-driven.
 
 ## Add your own photos
 
-You mentioned pulling photos from Google/other sources — here's the exact drop-in process:
+See `images/README.md` for the full guide. Short version:
 
-1. Make (or use) a folder under `images/` for the machine: `images/770/`, `images/440/`, `images/8l/`.
-2. Inside it, organize by category if you like: `images/770/workholding/smw-vise.jpg`, `images/770/endmills/flat-hss.jpg`, etc. (Category subfolders are just a convention — any path works.)
-3. In `data.js`, set that item's (or family's) `photo` field to the path **relative to the machine's folder** — e.g. `photo: "workholding/smw-vise.jpg"`.
+1. **Shared 440/770M equipment** (almost everything — vises, TTS holders, end mills) goes in `images/common/`. One photo shows up on both machine pages automatically.
+2. **Machine-only extras** (something one specific machine has that the other doesn't, or anything on the 8L) go in that machine's own folder: `images/440/`, `images/770/`, `images/8l/`.
+3. In `data.js`, set that item's (or family's) `photo` field to the path relative to its folder — e.g. `photo: "smw-vise.jpg"` for a shared item.
 4. Leave `photo: ""` and a blueprint placeholder icon is drawn automatically — handy while you're still collecting photos.
 
-Landscape ~4:3 photos on a plain background look best, and keep each file
-under ~500KB so the page stays fast on phones over makerspace wifi.
+Shoot roughly square-to-portrait (4:5 to 1:1), subject centered with margin
+— the same photo gets cropped into both a 4:3 grid thumbnail and a square
+detail view. Keep each file under ~500KB (`sips -Z 900 -s formatOptions 70
+photo.jpg --out out.jpg` on Mac) so the page stays fast on phones over
+makerspace wifi.
 
 For **End Mills / Turning Tools**, one photo per *family* (Type + Material) is
 usually enough — you don't need a separate photo for every diameter.
