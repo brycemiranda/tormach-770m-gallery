@@ -43,7 +43,7 @@ const MACHINES = [
     type: "mill",
     code: "MILL-440",
     tagline: "Desktop 3-axis mill · R8 spindle",
-    photo: "",
+    photo: "440-hero.jpg",
     specs: [
       ["Footprint", "Benchtop"],
       ["Spindle", "R8"],
@@ -56,7 +56,7 @@ const MACHINES = [
     type: "mill",
     code: "MILL-770",
     tagline: "3-axis mill · R8 spindle · shop workhorse",
-    photo: "",
+    photo: "770-hero.jpg",
     specs: [
       ["Footprint", "Floor-standing"],
       ["Spindle", "R8"],
@@ -69,7 +69,7 @@ const MACHINES = [
     type: "lathe",
     code: "LATHE-8L",
     tagline: "CNC lathe · turning, facing, boring",
-    photo: "",
+    photo: "8l-hero.webp",
     specs: [
       ["Swing", "8\" over bed"],
       ["Spindle", "A2-5 camlock"],
