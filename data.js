@@ -129,13 +129,14 @@ const COMMON_MILL_EQUIPMENT = {
     workholding: [
       {
         id: "vise-standard",
-        name: "Standard Vise",
+        name: "Standard Vise (6\")",
         code: "WH-01",
         icon: "vise",
-        photo: "",
+        photo: "workholding/vise-standard-6inch.jpg",
         tagline: "General-purpose milling vise",
         specs: [
           ["Type", "Fixed-jaw precision vise"],
+          ["Jaw width", "6\""],
           ["Use", "Prismatic / flat stock"],
           ["Pair with", "Parallels + soft jaws"],
         ],
@@ -147,7 +148,7 @@ const COMMON_MILL_EQUIPMENT = {
         name: "SMW Vise",
         code: "WH-02",
         icon: "vise",
-        photo: "",
+        photo: "workholding/vise-smw.jpg",
         tagline: "Saunders Machine Works modular vise",
         specs: [
           ["Type", "Modular / dovetail workholding"],
@@ -159,19 +160,21 @@ const COMMON_MILL_EQUIPMENT = {
       },
       {
         id: "vise-small",
-        name: "Smaller Vise",
+        name: "Smaller Vise (4\")",
         code: "WH-03",
         icon: "vise",
-        photo: "",
+        photo: "workholding/vise-small-4inch.jpg",
         tagline: "Compact vise for small parts",
         specs: [
           ["Type", "Compact milling vise"],
+          ["Jaw width", "4\""],
           ["Use", "Small / delicate parts"],
           ["Benefit", "Clears short tools"],
         ],
         notes:
           "Lower profile and lighter than the standard vise. Ideal for tiny stock where the big vise gets in the way of short tooling and Z clearance.",
       },
+      /* NOT CURRENTLY STOCKED — uncomment and add a photo when acquired.
       {
         id: "vise-cylindrical",
         name: "Cylindrical Vise",
@@ -187,6 +190,8 @@ const COMMON_MILL_EQUIPMENT = {
         notes:
           "Grips round bar and awkward geometry that a flat vise can't hold securely. Seat the part fully in the V and verify it can't spin under cutting load.",
       },
+      */
+      /* NOT CURRENTLY STOCKED — uncomment and add a photo when acquired.
       {
         id: "workholding-bits",
         name: "Workholding Bits",
@@ -202,15 +207,16 @@ const COMMON_MILL_EQUIPMENT = {
         notes:
           "The bin of supporting hardware for fixturing straight to the table or dressing a vise. Count parts back into the kit so nothing walks off.",
       },
+      */
       {
         id: "rotary-table-4th-axis",
-        name: "4th-Axis Rotary Table (with DRO)",
-        code: "WH-06",
+        name: "4\" Rotary Table (with DRO)",
+        code: "WH-04",
         icon: "vise",
-        photo: "",
+        photo: "workholding/rotary-table-4inch.jpg",
         tagline: "Rotary indexing for cylindrical & angled features",
         specs: [
-          ["Type", "4th-axis rotary table"],
+          ["Type", "4\" rotary table"],
           ["Readout", "Built-in DRO"],
           ["Use", "Indexed holes, radial features, wrapped profiles"],
         ],
@@ -220,24 +226,39 @@ const COMMON_MILL_EQUIPMENT = {
       {
         id: "rotary-table-dividing-plate",
         name: "Dividing Plate (for Rotary Table)",
-        code: "WH-07",
+        code: "WH-05",
         icon: "misc",
-        photo: "",
+        photo: "workholding/rotary-table-dividing-plate.jpg",
         tagline: "Manual index plate accessory for the rotary table",
         specs: [
           ["Type", "Dividing/index plate"],
           ["Use", "Manual rotary indexing without CNC control"],
-          ["Pair with", "4th-Axis Rotary Table"],
+          ["Pair with", "4\" Rotary Table"],
         ],
         notes:
           "Drops into the rotary table for manual hole-circle indexing when you're not driving the axis by CNC. Confirm the plate's hole-circle count matches what your layout needs before setup.",
       },
       {
+        id: "rotary-table-tailstock",
+        name: "Rotary Table Tailstock",
+        code: "WH-06",
+        icon: "misc",
+        photo: "workholding/tailstock-rotary-table.jpg",
+        tagline: "Support for the far end of longer stock",
+        specs: [
+          ["Type", "Tailstock"],
+          ["Use", "Supports long stock during 4th-axis work"],
+          ["Pair with", "4\" Rotary Table"],
+        ],
+        notes:
+          "Supports the far end of longer stock during rotary/4th-axis work, the same idea as a lathe tailstock. Align its center to the rotary table's axis before clamping in the part.",
+      },
+      {
         id: "123-blocks",
         name: "1-2-3 Blocks (Pair)",
-        code: "WH-08",
+        code: "WH-07",
         icon: "misc",
-        photo: "",
+        photo: "workholding/123-blocks.jpg",
         tagline: "Precision-ground setup blocks",
         specs: [
           ["Size", "1\" × 2\" × 3\""],
@@ -247,6 +268,7 @@ const COMMON_MILL_EQUIPMENT = {
         notes:
           "Precision-ground reference blocks for squaring up work, propping parts to height, or bolting together as a quick fixture (most sets are drilled/tapped). Handle by the faces, not the edges, to protect the ground finish.",
       },
+      /* NOT CURRENTLY STOCKED — uncomment and add a photo when acquired.
       {
         id: "vise-stop-kit",
         name: "Vise Stop Kit",
@@ -261,12 +283,13 @@ const COMMON_MILL_EQUIPMENT = {
         notes:
           "Clamps to the vise to give repeatable stock positioning across multiple parts — set it once, load/unload against the stop instead of re-indicating every part.",
       },
+      */
       {
         id: "parallels-boxed-set",
         name: "Parallels (Boxed Set)",
-        code: "WH-10",
+        code: "WH-08",
         icon: "misc",
-        photo: "",
+        photo: "workholding/parallels-boxed-set.jpg",
         tagline: "Matched precision parallel set",
         specs: [
           ["Type", "Precision ground parallels"],
