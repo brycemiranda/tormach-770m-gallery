@@ -154,6 +154,32 @@ body::before {
 }
 .search input::placeholder { color: var(--muted); }
 
+/* ---- Per-machine local search dropdown ------------------------------------- */
+.searchwrap { position: relative; flex: 1; min-width: 220px; }
+.dropdown {
+  position: absolute; top: calc(100% + 8px); left: 0; right: 0; z-index: 30;
+  background: var(--panel); border: 1.5px solid var(--line); border-radius: var(--radius);
+  box-shadow: 0 16px 32px -18px rgba(87, 6, 140, 0.35);
+  overflow: hidden;
+}
+.dropdown:empty { display: none; border: none; box-shadow: none; }
+.dropdown__row {
+  display: flex; justify-content: space-between; align-items: center; gap: 14px;
+  padding: 13px 18px; font-family: var(--body); font-size: 13.5px; color: var(--ink);
+  border-bottom: 1px solid var(--line); transition: background 0.12s ease;
+}
+.dropdown__row:last-child { border-bottom: none; }
+.dropdown__row:hover { background: var(--violet-tint); }
+.dropdown__name { font-weight: 500; }
+.dropdown__cat {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; color: var(--muted);
+  text-transform: uppercase; flex: none;
+}
+.dropdown__row--global {
+  font-style: italic; color: var(--violet-deep); font-size: 13px;
+}
+.dropdown__row--global strong { font-style: normal; font-weight: 600; }
+
 .filters { display: flex; gap: 8px; flex-wrap: wrap; }
 .chip {
   font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em;

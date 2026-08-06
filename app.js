@@ -203,9 +203,27 @@ function parseHash() {
   return path.split("/").filter(Boolean);
 }
 
+function hashQueryParams() {
+  const raw = location.hash.replace(/^#\/?/, "");
+  const [, search] = raw.split("?");
+  return new URLSearchParams(search || "");
+}
+
 function go(hash) {
   location.hash = hash;
 }
+
+/* Close any open search dropdown when the user clicks outside its wrapper.
+   Attached once at load — never re-added on re-render — since it lives on
+   `document`, which persists across route changes. */
+document.addEventListener("click", (e) => {
+  document.querySelectorAll(".searchwrap").forEach((wrap) => {
+    if (!wrap.contains(e.target)) {
+      const dd = wrap.querySelector(".dropdown");
+      if (dd) dd.innerHTML = "";
+    }
+  });
+});
 
 function topBar() {
   return `
@@ -249,7 +267,7 @@ function render() {
   const segs = parseHash();
   window.scrollTo({ top: 0, behavior: "instant" in window.scrollTo ? "instant" : "auto" });
 
-  if (segs.length === 0) return renderHome();
+  if (segs.length === 0) return renderHome(hashQueryParams().get("q") || "");
 
   if (segs[0] === "m" && segs[1]) {
     const machine = machineById(segs[1]);
@@ -284,7 +302,7 @@ function renderNotFound() {
     </div>`;
 }
 
-function renderHome() {
+function renderHome(initialQuery) {
   root.innerHTML = `
     <header class="hero">
       ${topBar()}
@@ -329,8 +347,8 @@ function renderHome() {
   const results = document.getElementById("home-results");
   const mgridWrap = document.getElementById("mgrid-wrap");
 
-  input.addEventListener("input", (e) => {
-    const q = e.target.value.trim().toLowerCase();
+  function doSearch(rawQuery) {
+    const q = rawQuery.trim().toLowerCase();
     if (!q) {
       results.innerHTML = "";
       mgridWrap.style.display = "";
@@ -346,7 +364,7 @@ function renderHome() {
     );
 
     if (!matches.length) {
-      results.innerHTML = `<p class="empty">No equipment matches “${e.target.value}”.</p>`;
+      results.innerHTML = `<p class="empty">No equipment matches “${escAttr(rawQuery)}”.</p>`;
       return;
     }
 
@@ -370,7 +388,13 @@ function renderHome() {
           )
           .join("")}
       </div>`;
-  });
+  }
+
+  input.addEventListener("input", (e) => doSearch(e.target.value));
+  if (initialQuery) {
+    input.value = initialQuery;
+    doSearch(initialQuery);
+  }
 }
 
 function renderMachineHub(machine) {
@@ -389,6 +413,15 @@ function renderMachineHub(machine) {
       </div>
     </header>
     <div class="page">
+      <div class="controls controls--static">
+        <div class="searchwrap">
+          <div class="search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <input id="machine-search" type="search" placeholder="Search ${escAttr(machine.name)}…" autocomplete="off" />
+          </div>
+          <div class="dropdown" id="machine-search-dropdown"></div>
+        </div>
+      </div>
       <div class="cgrid">
         ${cats
           .map((c, i) => {
@@ -406,6 +439,46 @@ function renderMachineHub(machine) {
       </div>
       ${machineSwitcher(machine)}
     </div>`;
+
+  const msInput = document.getElementById("machine-search");
+  const msDropdown = document.getElementById("machine-search-dropdown");
+
+  msInput.addEventListener("input", (e) => {
+    const raw = e.target.value;
+    const q = raw.trim().toLowerCase();
+    if (!q) {
+      msDropdown.innerHTML = "";
+      return;
+    }
+
+    const matches = searchIndex().filter(
+      (row) =>
+        row.machine.id === machine.id &&
+        [row.item.name, row.item.tagline, row.item.notes, row.category.label]
+          .join(" ")
+          .toLowerCase()
+          .includes(q)
+    );
+
+    if (!matches.length) {
+      msDropdown.innerHTML = `
+        <a class="dropdown__row dropdown__row--global" href="#/?q=${encodeURIComponent(raw.trim())}">
+          No matches on ${escAttr(machine.name)} for “${escAttr(raw.trim())}” — <strong>search all machines</strong> →
+        </a>`;
+      return;
+    }
+
+    msDropdown.innerHTML = matches
+      .slice(0, 8)
+      .map(
+        (row) => `
+      <a class="dropdown__row" href="${row.href}">
+        <span class="dropdown__name">${row.item.name}</span>
+        <span class="dropdown__cat">${row.category.label}</span>
+      </a>`
+      )
+      .join("");
+  });
 }
 
 /* ---- Flat category: grid + search -------------------------------------- */
