@@ -129,12 +129,22 @@ body::before {
 }
 .hero__sub { max-width: 620px; margin-top: 20px; color: var(--muted); font-size: 15px; }
 
-.hero__meta {
-  display: flex; gap: 26px; flex-wrap: wrap; padding: 16px 24px;
-  max-width: 1180px; margin: 0 auto; border-top: 1px solid var(--line);
-  font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; color: var(--muted);
+/* ---- Good to know (machine spec callout) ----------------------------------- */
+.goodtoknow {
+  display: flex; align-items: flex-start; gap: 14px;
+  background: var(--violet-tint); border: 1.5px solid var(--violet-tint-strong);
+  border-radius: var(--radius); padding: 18px 22px; margin: 14px 0 28px;
 }
-.hero__meta b { color: var(--ink); font-weight: 600; letter-spacing: 0; }
+.goodtoknow__icon { width: 20px; height: 20px; color: var(--violet); flex: none; margin-top: 1px; }
+.goodtoknow__body { flex: 1; min-width: 0; }
+.goodtoknow__label {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; font-weight: 600;
+  color: var(--violet-deep); text-transform: uppercase; margin-bottom: 10px;
+}
+.goodtoknow__grid { display: flex; flex-wrap: wrap; gap: 8px 30px; }
+.goodtoknow__grid > div { display: flex; align-items: baseline; gap: 7px; }
+.goodtoknow__grid dt { font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em; color: var(--muted); }
+.goodtoknow__grid dd { font-size: 13.5px; font-weight: 600; color: var(--ink); }
 
 /* ---- Controls ------------------------------------------------------------ */
 .controls {
@@ -302,5 +312,5 @@ body::before {
 @media (max-width: 640px) {
   .detail { grid-template-columns: 1fr; }
   .detail__img { aspect-ratio: 16 / 10; }
-  .hero__meta { gap: 16px; }
+  .goodtoknow__grid { gap: 8px 20px; }
 }

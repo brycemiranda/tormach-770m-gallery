@@ -263,6 +263,22 @@ function machineSwitcher(currentMachine) {
     </div>`;
 }
 
+function goodToKnow(machine) {
+  if (!machine.specs || !machine.specs.length) return "";
+  return `
+    <div class="goodtoknow">
+      <svg class="goodtoknow__icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/>
+      </svg>
+      <div class="goodtoknow__body">
+        <p class="goodtoknow__label">Good to know</p>
+        <dl class="goodtoknow__grid">
+          ${machine.specs.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}
+        </dl>
+      </div>
+    </div>`;
+}
+
 function render() {
   const segs = parseHash();
   window.scrollTo({ top: 0, behavior: "instant" in window.scrollTo ? "instant" : "auto" });
@@ -408,11 +424,9 @@ function renderMachineHub(machine) {
         <h1 class="h1--sub">${machine.name}</h1>
         <p class="hero__sub">${machine.tagline}</p>
       </div>
-      <div class="hero__meta">
-        ${machine.specs.map(([k, v]) => `<span>${k}: <b>${v}</b></span>`).join("")}
-      </div>
     </header>
     <div class="page">
+      ${goodToKnow(machine)}
       <div class="controls controls--static">
         <div class="searchwrap">
           <div class="search">
