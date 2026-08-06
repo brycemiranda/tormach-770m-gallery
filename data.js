@@ -302,13 +302,14 @@ const COMMON_MILL_EQUIPMENT = {
     toolholding: [
       {
         id: "tts-drill-chuck",
-        name: "TTS Drill Chuck",
+        name: "TTS Drill Chuck (1/4\")",
         code: "TH-01",
         icon: "toolholder",
         photo: "",
         tagline: "Keyless chuck on a TTS shank",
         specs: [
           ["System", "TTS (Tormach Tooling System)"],
+          ["Capacity", "1/4\""],
           ["Grip", "Keyless chuck, round shanks"],
           ["Use", "Twist drills, center drills"],
         ],
@@ -317,13 +318,14 @@ const COMMON_MILL_EQUIPMENT = {
       },
       {
         id: "tts-solid-allen",
-        name: "TTS Solid Holder (Set-Screw)",
+        name: "TTS Solid Holder (1/4\" Set-Screw)",
         code: "TH-02",
         icon: "toolholder",
-        photo: "",
+        photo: "toolholding/tts-setscrew-holder-1-4inch.webp",
         tagline: "Rigid holder, tightened with an allen key",
         specs: [
           ["System", "TTS (Tormach Tooling System)"],
+          ["Shank size", "1/4\""],
           ["Grip", "Hex set-screw onto shank flat"],
           ["Use", "Rigid end mill holding"],
         ],
@@ -335,7 +337,7 @@ const COMMON_MILL_EQUIPMENT = {
         name: "TTS ER20 Collet Holder",
         code: "TH-03",
         icon: "toolholder",
-        photo: "",
+        photo: "toolholding/tts-er20.jpg",
         tagline: "Collet holder for round-shank tooling",
         specs: [
           ["System", "TTS (Tormach Tooling System)"],
