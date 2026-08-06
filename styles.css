@@ -61,19 +61,24 @@ body::before {
   padding: 18px 0 6px;
 }
 .crumbs {
-  display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
+  display: flex; flex-wrap: wrap; gap: 2px; align-items: center;
   font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: var(--muted);
 }
-.crumbs a:hover { color: var(--violet); }
+/* Padding + matching negative margin grows the tap target to ~35px without
+   visually inflating the breadcrumb row's height (thumb targets on mobile). */
+.crumbs a {
+  padding: 9px 5px; margin: -9px -5px; border-radius: 6px; display: inline-block;
+}
+.crumbs a:hover { color: var(--violet); background: var(--violet-tint); }
 .crumbs__sep { color: var(--line); margin: 0 2px; }
-.crumbs__here { color: var(--violet); font-weight: 600; }
+.crumbs__here { color: var(--violet); font-weight: 600; padding: 9px 5px; margin: -9px -5px; display: inline-block; }
 
 .backbtn {
   display: inline-flex; align-items: center; gap: 6px;
   font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
   color: var(--violet-deep); background: var(--violet-tint);
   border: 1.5px solid var(--violet-tint-strong); border-radius: 999px;
-  padding: 6px 14px 6px 11px; transition: all 0.15s ease; flex: none;
+  padding: 10px 16px 10px 12px; transition: all 0.15s ease; flex: none;
 }
 .backbtn:hover { color: #fff; background: var(--violet); border-color: var(--violet); }
 .backbtn svg { flex: none; }
@@ -94,7 +99,10 @@ body::before {
   font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; color: var(--muted);
   padding-bottom: 14px; border-bottom: 1px solid var(--line);
 }
-.hero__home { transition: color 0.15s ease; }
+.hero__home {
+  transition: color 0.15s ease; display: inline-block;
+  padding: 10px 6px; margin: -10px -6px; border-radius: 6px;
+}
 .hero__home:hover { color: var(--violet); }
 .hero__status { display: inline-flex; align-items: center; gap: 8px; color: var(--violet); font-weight: 600; }
 .hero__status i {
@@ -159,7 +167,7 @@ body::before {
 }
 .search svg { width: 16px; height: 16px; fill: none; stroke: var(--muted); stroke-width: 2; flex: none; }
 .search input {
-  flex: 1; background: none; border: 0; color: var(--ink);
+  flex: 1; height: 100%; background: none; border: 0; color: var(--ink);
   font-family: var(--body); font-size: 14px; outline: none;
 }
 .search input::placeholder { color: var(--muted); }
