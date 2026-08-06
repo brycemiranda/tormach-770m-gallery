@@ -180,12 +180,14 @@ function searchIndex() {
       if (category.facets) {
         const facetKeys = category.facets.map((f) => f.key);
         drilldownItemsFor(machine, category).forEach((item) => {
-          const path = facetKeys.map((k) => slugify(item.facets[k] || "")).join("/");
+          const qs = facetKeys
+            .map((k) => `${k}=${encodeURIComponent(slugify(item.facets[k] || ""))}`)
+            .join("&");
           rows.push({
             machine,
             category,
             item,
-            href: `#/m/${machine.id}/${category.id}/${path}`,
+            href: `#/m/${machine.id}/${category.id}?${qs}`,
           });
         });
       } else {
@@ -202,13 +204,6 @@ function searchIndex() {
   });
   _searchIndex = rows;
   return rows;
-}
-
-function itemMatchesSelections(item, facetKeys, selections) {
-  for (let i = 0; i < selections.length; i++) {
-    if (slugify(item.facets[facetKeys[i]] || "") !== selections[i]) return false;
-  }
-  return true;
 }
 
 /* ==========================================================================
@@ -311,7 +306,7 @@ function render() {
     const category = categoryById(machine, segs[2]);
     if (!category) return renderNotFound();
 
-    if (category.facets) return renderWizard(machine, category, segs.slice(3));
+    if (category.facets) return renderFacetBrowser(machine, category);
 
     if (segs.length === 4) return renderFlatDetail(machine, category, segs[3]);
     return renderFlatGrid(machine, category);
@@ -613,80 +608,159 @@ function detailPanel(machine, item, categoryLabel) {
     </div>`;
 }
 
-/* ---- Drilldown wizard (End Mills / Turning Tools) ----------------------- */
-function renderWizard(machine, category, selections) {
+/* ---- Faceted browser (End Mills / Turning Tools) --------------------------
+   All facet rows (Type, Material, Diameter, Flutes...) are shown at once as
+   multi-select toggle chips that narrow each other live, instead of forcing
+   a sequential tap-through wizard. Results render as one card per Type+
+   Material "family" with every matching size/flute listed inside it as a
+   badge — since several brands can stock the same nominal spec, a card
+   represents the SPEC, not a single photographable product.
+   Selection state lives in the URL query string, e.g. ?type=flat&material=hss
+   (comma-separated for multiple values in one facet), so results are
+   shareable/bookmarkable and the browser back button works normally. */
+function parseFacetSelections(facetKeys) {
+  const params = hashQueryParams();
+  const selections = {};
+  facetKeys.forEach((k) => {
+    const raw = params.get(k);
+    selections[k] = raw ? raw.split(",").filter(Boolean) : [];
+  });
+  return selections;
+}
+
+function facetBrowserHref(machine, category, facetKeys, selections) {
+  const qs = facetKeys
+    .map((k) => (selections[k] && selections[k].length ? `${k}=${selections[k].join(",")}` : null))
+    .filter(Boolean)
+    .join("&");
+  return `#/m/${machine.id}/${category.id}${qs ? "?" + qs : ""}`;
+}
+
+function itemMatchesAllFacets(item, facetKeys, selections) {
+  return facetKeys.every((k) => {
+    const sel = selections[k];
+    if (!sel || !sel.length) return true;
+    return sel.includes(slugify(item.facets[k] || ""));
+  });
+}
+
+/* Distinct values (+ counts) available for `targetKey`, given the current
+   selections on every OTHER facet — standard faceted-search narrowing. A
+   count of 0 means "no results if you also picked this," shown disabled
+   rather than hidden, so the filter bar doesn't jump around as you click. */
+/* Distinct values (+ counts) available for `targetKey`, given the current
+   selections on every OTHER facet. Values with zero remaining matches are
+   left out entirely (rather than shown disabled) — Diameter/Flutes options
+   vary a lot by Type (numbered drill sizes vs. fractional inches), so
+   showing every value that ever exists, mostly disabled, would be noisier
+   than just narrowing to what's actually reachable right now. */
+function facetOptionCounts(allItems, facetKeys, selections, targetKey) {
+  const filtered = allItems.filter((it) =>
+    facetKeys.every((k) => {
+      if (k === targetKey) return true;
+      const sel = selections[k];
+      if (!sel || !sel.length) return true;
+      return sel.includes(slugify(it.facets[k] || ""));
+    })
+  );
+  const options = new Map(); // slug -> {label, count}
+  filtered.forEach((it) => {
+    const val = it.facets[targetKey];
+    if (val == null) return;
+    const slug = slugify(val);
+    const entry = options.get(slug) || { label: formatFacetValue(targetKey, val), count: 0 };
+    entry.count++;
+    options.set(slug, entry);
+  });
+  return options;
+}
+
+function renderFacetBrowser(machine, category) {
   const facetKeys = category.facets.map((f) => f.key);
   const allItems = drilldownItemsFor(machine, category);
-  const filtered = allItems.filter((it) => itemMatchesSelections(it, facetKeys, selections));
+  const selections = parseFacetSelections(facetKeys);
+  const filtered = allItems.filter((it) => itemMatchesAllFacets(it, facetKeys, selections));
+  const anyActive = facetKeys.some((k) => selections[k].length);
 
-  const crumbs = [
-    { label: "Home", href: "#/" },
-    { label: machine.name, href: `#/m/${machine.id}` },
-    { label: category.label, href: `#/m/${machine.id}/${category.id}` },
-  ];
-  selections.forEach((sel, i) => {
-    const prefixItems = allItems.filter((it) =>
-      itemMatchesSelections(it, facetKeys, selections.slice(0, i))
-    );
-    const match = prefixItems.find((it) => slugify(it.facets[facetKeys[i]] || "") === sel);
-    const label = match ? formatFacetValue(facetKeys[i], match.facets[facetKeys[i]]) : sel;
-    crumbs.push({
-      label,
-      href: `#/m/${machine.id}/${category.id}/${selections.slice(0, i + 1).join("/")}`,
-    });
+  const filterRows = category.facets
+    .map((f) => {
+      const options = facetOptionCounts(allItems, facetKeys, selections, f.key);
+      const selectedSet = new Set(selections[f.key]);
+      const sorted = Array.from(options.entries()).sort((a, b) =>
+        a[1].label.localeCompare(b[1].label, undefined, { numeric: true })
+      );
+      const chips = sorted
+        .map(([slug, { label, count }]) => {
+          const isSel = selectedSet.has(slug);
+          const isOff = count === 0 && !isSel;
+          const next = { ...selections, [f.key]: isSel
+            ? selections[f.key].filter((s) => s !== slug)
+            : [...selections[f.key], slug] };
+          const href = isOff ? null : facetBrowserHref(machine, category, facetKeys, next);
+          return `<a class="fchip${isSel ? " fchip--on" : ""}${isOff ? " fchip--off" : ""}" ${href ? `href="${href}"` : 'aria-disabled="true"'}>${label}<span class="fchip__count">${count}</span></a>`;
+        })
+        .join("");
+      return `
+        <div class="frow">
+          <span class="frow__label">${f.label}</span>
+          <div class="frow__chips">${chips}</div>
+        </div>`;
+    })
+    .join("");
+
+  // Group results into one card per Type+Material family (facetKeys[0], [1])
+  // — every category using this browser defines its first two facets that way.
+  const groups = new Map();
+  filtered.forEach((it) => {
+    const gkey = slugify(it.facets[facetKeys[0]] || "") + "|" + slugify(it.facets[facetKeys[1]] || "");
+    if (!groups.has(gkey)) groups.set(gkey, []);
+    groups.get(gkey).push(it);
   });
+  const badgeKeys = facetKeys.slice(2);
+
+  const resultsHtml = groups.size
+    ? Array.from(groups.values())
+        .map((items) => {
+          const sample = items[0];
+          const badges = items
+            .map((it) => {
+              const label = badgeKeys
+                .filter((k) => it.facets[k] != null)
+                .map((k) => formatFacetValue(k, it.facets[k]))
+                .join(" · ");
+              return `<span class="fbadge">${label || "—"}</span>`;
+            })
+            .join("");
+          return `
+          <div class="fgroup">
+            <div class="fgroup__icon"><svg viewBox="0 0 100 100" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">${ICONS[sample.icon] || ICONS.misc}</svg></div>
+            <div class="fgroup__body">
+              <h3>${formatFacetValue(facetKeys[0], sample.facets[facetKeys[0]])} · ${formatFacetValue(facetKeys[1], sample.facets[facetKeys[1]])}</h3>
+              <p class="fgroup__tag">${sample.tagline}</p>
+              <div class="fgroup__badges">${badges}</div>
+              <p class="fgroup__notes">${sample.notes}</p>
+            </div>
+          </div>`;
+        })
+        .join("")
+    : `<p class="empty">No matches with these filters. <a href="#/m/${machine.id}/${category.id}">Clear filters</a>.</p>`;
 
   root.innerHTML = `
     <header class="hero hero--sub hero--tight">
       ${topBar()}
-      ${crumbBar(crumbs)}
+      ${crumbBar([
+        { label: "Home", href: "#/" },
+        { label: machine.name, href: `#/m/${machine.id}` },
+        { label: category.label },
+      ])}
       <h1 class="h1--cat">${category.label}</h1>
     </header>
-    <div class="page" id="wizard-body"></div>`;
-
-  const body = document.getElementById("wizard-body");
-
-  // All facets chosen -> show the resolved item(s)
-  if (selections.length >= facetKeys.length) {
-    if (!filtered.length) {
-      body.innerHTML = `<p class="empty">No match. <a href="#/m/${machine.id}/${category.id}">Start over</a>.</p>`;
-      return;
-    }
-    body.innerHTML = filtered
-      .map((it) => detailPanel(machine, it, category.label))
-      .join('<div style="height:16px"></div>');
-    return;
-  }
-
-  const nextKey = facetKeys[selections.length];
-  const nextLabel = category.facets[selections.length].label;
-
-  // distinct values available for the next facet, given prior selections
-  const seen = new Map(); // slug -> label
-  filtered.forEach((it) => {
-    const val = it.facets[nextKey];
-    if (val != null) seen.set(slugify(val), formatFacetValue(nextKey, val));
-  });
-
-  if (!seen.size) {
-    body.innerHTML = `<p class="empty">No options here yet. <a href="#/m/${machine.id}/${category.id}">Start over</a>.</p>`;
-    return;
-  }
-
-  const stepNum = selections.length + 1;
-  const stepTotal = facetKeys.length;
-
-  body.innerHTML = `
-    <div class="wizard">
-      <div class="wizard__step">STEP ${stepNum} / ${stepTotal} — CHOOSE ${nextLabel.toUpperCase()}</div>
-      <div class="wizard__chips">
-        ${Array.from(seen.entries())
-          .map(
-            ([slug, label]) =>
-              `<a class="chip chip--lg" href="#/m/${machine.id}/${category.id}/${[...selections, slug].join("/")}">${label}</a>`
-          )
-          .join("")}
+    <div class="page">
+      <div class="fbar">
+        ${filterRows}
+        ${anyActive ? `<a class="fclear" href="#/m/${machine.id}/${category.id}">Clear all filters</a>` : ""}
       </div>
-      <p class="wizard__count">${filtered.length} matching item${filtered.length === 1 ? "" : "s"} so far</p>
+      <p class="fcount">${filtered.length} matching item${filtered.length === 1 ? "" : "s"}</p>
+      <div class="fgroups">${resultsHtml}</div>
     </div>`;
 }
