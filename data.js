@@ -349,6 +349,7 @@ const COMMON_MILL_EQUIPMENT = {
       },
     ],
     measuring: [
+      /* NOT CURRENTLY STOCKED — uncomment and add a photo when acquired.
       {
         id: "optical-edge-finder",
         name: "Optical Edge Finder",
@@ -364,12 +365,13 @@ const COMMON_MILL_EQUIPMENT = {
         notes:
           "Sight down onto the edge to set X/Y zero without touching the part — good for finished or delicate surfaces. Keep the lens clean and the spindle stopped while sighting.",
       },
+      */
       {
         id: "dial-indicator",
         name: "Dial Indicator",
-        code: "ME-02",
+        code: "ME-01",
         icon: "measuring",
-        photo: "",
+        photo: "measuring/dial-indicator.webp",
         tagline: "Tramming, indicating & runout",
         specs: [
           ["Reads", "0.001\" increments"],
@@ -382,9 +384,9 @@ const COMMON_MILL_EQUIPMENT = {
       {
         id: "machinist-squares-kit",
         name: "Machinist Squares Kit",
-        code: "ME-03",
+        code: "ME-02",
         icon: "measuring",
-        photo: "",
+        photo: "measuring/machinist-squares-kit.jpg",
         tagline: "Squares for checking perpendicularity",
         specs: [
           ["Type", "Precision machinist square set"],
@@ -396,9 +398,9 @@ const COMMON_MILL_EQUIPMENT = {
       {
         id: "height-gauge-granite",
         name: "Height Gauge (Vertical Caliper) + Granite Bases",
-        code: "ME-04",
+        code: "ME-03",
         icon: "measuring",
-        photo: "",
+        photo: "measuring/height-gauge-granite.webp",
         tagline: "Precision height measurement on a granite surface plate",
         specs: [
           ["Type", "Vertical (height) caliper"],
