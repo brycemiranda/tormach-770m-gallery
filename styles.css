@@ -55,15 +55,36 @@ body::before {
 
 .page { max-width: 1180px; margin: 0 auto; padding: 0 24px 60px; }
 
-/* ---- Breadcrumbs ----------------------------------------------------------- */
+/* ---- Breadcrumbs + back button ---------------------------------------------- */
+.crumbrow {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 14px;
+  padding: 18px 0 6px;
+}
 .crumbs {
   display: flex; flex-wrap: wrap; gap: 6px; align-items: center;
   font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: var(--muted);
-  padding: 18px 0 6px;
 }
 .crumbs a:hover { color: var(--violet); }
 .crumbs__sep { color: var(--line); margin: 0 2px; }
 .crumbs__here { color: var(--violet); font-weight: 600; }
+
+.backbtn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+  color: var(--violet-deep); background: var(--violet-tint);
+  border: 1.5px solid var(--violet-tint-strong); border-radius: 999px;
+  padding: 6px 14px 6px 11px; transition: all 0.15s ease; flex: none;
+}
+.backbtn:hover { color: #fff; background: var(--violet); border-color: var(--violet); }
+.backbtn svg { flex: none; }
+
+/* ---- Machine switcher (on machine hub) --------------------------------------- */
+.switcher { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); }
+.switcher__label {
+  display: block; font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em;
+  color: var(--muted); text-transform: uppercase; margin-bottom: 12px;
+}
+.switcher__chips { display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* ---- Hero ---------------------------------------------------------------- */
 .hero { max-width: 1180px; margin: 0 auto; padding: 22px 24px 12px; position: relative; z-index: 1; }
@@ -73,6 +94,8 @@ body::before {
   font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; color: var(--muted);
   padding-bottom: 14px; border-bottom: 1px solid var(--line);
 }
+.hero__home { transition: color 0.15s ease; }
+.hero__home:hover { color: var(--violet); }
 .hero__status { display: inline-flex; align-items: center; gap: 8px; color: var(--violet); font-weight: 600; }
 .hero__status i {
   width: 7px; height: 7px; border-radius: 50%; background: var(--violet);

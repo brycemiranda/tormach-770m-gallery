@@ -173,15 +173,42 @@ function go(hash) {
   location.hash = hash;
 }
 
+function topBar() {
+  return `
+    <div class="hero__bar">
+      <a href="#/" class="hero__home">NYU MAKERSPACE</a>
+      <span class="hero__status"><i></i> ONLINE</span>
+    </div>`;
+}
+
 function crumbBar(items) {
   // items: [{label, href}] — last one is current (no link)
-  return `<nav class="crumbs">${items
+  const backHref = items.length > 1 ? items[items.length - 2].href : null;
+  const back = backHref
+    ? `<a class="backbtn" href="${backHref}" aria-label="Back">
+        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+        Back
+      </a>`
+    : "";
+  const crumbs = `<nav class="crumbs">${items
     .map((it, i) =>
       i === items.length - 1
         ? `<span class="crumbs__here">${it.label}</span>`
         : `<a href="${it.href}">${it.label}</a><span class="crumbs__sep">/</span>`
     )
     .join("")}</nav>`;
+  return `<div class="crumbrow">${back}${crumbs}</div>`;
+}
+
+function machineSwitcher(currentMachine) {
+  const others = MACHINES.filter((m) => m.id !== currentMachine.id);
+  return `
+    <div class="switcher">
+      <span class="switcher__label">Switch machine</span>
+      <div class="switcher__chips">
+        ${others.map((m) => `<a class="chip" href="#/m/${m.id}">${m.name}</a>`).join("")}
+      </div>
+    </div>`;
 }
 
 function render() {
@@ -217,6 +244,7 @@ window.addEventListener("DOMContentLoaded", render);
 function renderNotFound() {
   root.innerHTML = `
     <div class="page">
+      ${topBar()}
       ${crumbBar([{ label: "Home", href: "#/" }, { label: "Not found" }])}
       <div class="empty">That page doesn't exist. <a href="#/">Back home</a>.</div>
     </div>`;
@@ -225,10 +253,7 @@ function renderNotFound() {
 function renderHome() {
   root.innerHTML = `
     <header class="hero">
-      <div class="hero__bar">
-        <span class="hero__loc">NYU MAKERSPACE</span>
-        <span class="hero__status"><i></i> ONLINE</span>
-      </div>
+      ${topBar()}
       <div class="hero__main">
         <p class="hero__eyebrow">CNC EQUIPMENT CATALOG</p>
         <h1>SELECT<span>MACHINE</span></h1>
@@ -262,10 +287,7 @@ function renderMachineHub(machine) {
   const cats = categoriesFor(machine);
   root.innerHTML = `
     <header class="hero hero--sub">
-      <div class="hero__bar">
-        <span class="hero__loc">NYU MAKERSPACE</span>
-        <span class="hero__status"><i></i> ONLINE</span>
-      </div>
+      ${topBar()}
       ${crumbBar([{ label: "Home", href: "#/" }, { label: machine.name }])}
       <div class="hero__main hero__main--sub">
         <p class="hero__eyebrow">${machine.type === "lathe" ? "CNC LATHE" : "CNC MILL"} · ${machine.code}</p>
@@ -292,6 +314,7 @@ function renderMachineHub(machine) {
           })
           .join("")}
       </div>
+      ${machineSwitcher(machine)}
     </div>`;
 }
 
@@ -301,6 +324,7 @@ function renderFlatGrid(machine, category) {
 
   root.innerHTML = `
     <header class="hero hero--sub hero--tight">
+      ${topBar()}
       ${crumbBar([
         { label: "Home", href: "#/" },
         { label: machine.name, href: `#/m/${machine.id}` },
@@ -362,13 +386,16 @@ function renderFlatDetail(machine, category, itemId) {
   if (!item) return renderNotFound();
 
   root.innerHTML = `
-    <div class="page">
+    <header class="hero hero--sub hero--tight">
+      ${topBar()}
       ${crumbBar([
         { label: "Home", href: "#/" },
         { label: machine.name, href: `#/m/${machine.id}` },
         { label: category.label, href: `#/m/${machine.id}/${category.id}` },
         { label: item.name },
       ])}
+    </header>
+    <div class="page">
       ${detailPanel(machine, item, category.label)}
     </div>`;
 }
@@ -417,6 +444,7 @@ function renderWizard(machine, category, selections) {
 
   root.innerHTML = `
     <header class="hero hero--sub hero--tight">
+      ${topBar()}
       ${crumbBar(crumbs)}
       <h1 class="h1--cat">${category.label}</h1>
     </header>
