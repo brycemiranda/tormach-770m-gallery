@@ -202,6 +202,79 @@ const COMMON_MILL_EQUIPMENT = {
         notes:
           "The bin of supporting hardware for fixturing straight to the table or dressing a vise. Count parts back into the kit so nothing walks off.",
       },
+      {
+        id: "rotary-table-4th-axis",
+        name: "4th-Axis Rotary Table (with DRO)",
+        code: "WH-06",
+        icon: "vise",
+        photo: "",
+        tagline: "Rotary indexing for cylindrical & angled features",
+        specs: [
+          ["Type", "4th-axis rotary table"],
+          ["Readout", "Built-in DRO"],
+          ["Use", "Indexed holes, radial features, wrapped profiles"],
+        ],
+        notes:
+          "Mounts across the table to add rotary indexing — good for bolt-hole patterns, radial slots, or engraving around a cylindrical part. Confirm centerline height and tailstock support before running long stock. The onboard DRO is for manual reference only, not a substitute for zeroing in the controller.",
+      },
+      {
+        id: "rotary-table-dividing-plate",
+        name: "Dividing Plate (for Rotary Table)",
+        code: "WH-07",
+        icon: "misc",
+        photo: "",
+        tagline: "Manual index plate accessory for the rotary table",
+        specs: [
+          ["Type", "Dividing/index plate"],
+          ["Use", "Manual rotary indexing without CNC control"],
+          ["Pair with", "4th-Axis Rotary Table"],
+        ],
+        notes:
+          "Drops into the rotary table for manual hole-circle indexing when you're not driving the axis by CNC. Confirm the plate's hole-circle count matches what your layout needs before setup.",
+      },
+      {
+        id: "123-blocks",
+        name: "1-2-3 Blocks (Pair)",
+        code: "WH-08",
+        icon: "misc",
+        photo: "",
+        tagline: "Precision-ground setup blocks",
+        specs: [
+          ["Size", "1\" × 2\" × 3\""],
+          ["Use", "Setups, spacing, squaring, fixturing"],
+          ["Qty on hand", "2"],
+        ],
+        notes:
+          "Precision-ground reference blocks for squaring up work, propping parts to height, or bolting together as a quick fixture (most sets are drilled/tapped). Handle by the faces, not the edges, to protect the ground finish.",
+      },
+      {
+        id: "vise-stop-kit",
+        name: "Vise Stop Kit",
+        code: "WH-09",
+        icon: "misc",
+        photo: "",
+        tagline: "Repeatable stop for vise-mounted stock",
+        specs: [
+          ["Type", "Adjustable vise stop"],
+          ["Use", "Repeatable part-to-part positioning"],
+        ],
+        notes:
+          "Clamps to the vise to give repeatable stock positioning across multiple parts — set it once, load/unload against the stop instead of re-indicating every part.",
+      },
+      {
+        id: "parallels-boxed-set",
+        name: "Parallels (Boxed Set)",
+        code: "WH-10",
+        icon: "misc",
+        photo: "",
+        tagline: "Matched precision parallel set",
+        specs: [
+          ["Type", "Precision ground parallels"],
+          ["Use", "Elevate/support work in the vise"],
+        ],
+        notes:
+          "The dedicated matched-pair boxed set — keep pairs together and pick matching heights so the part doesn't rock. Distinct from the loose parallels in Workholding Bits; return this set to its own box.",
+      },
     ],
     toolholding: [
       {
@@ -281,6 +354,35 @@ const COMMON_MILL_EQUIPMENT = {
         notes:
           "Sweep to tram the vise square, indicate a bore, or check runout. Handle gently — don't slam the plunger. Return it to its padded case after use.",
       },
+      {
+        id: "machinist-squares-kit",
+        name: "Machinist Squares Kit",
+        code: "ME-03",
+        icon: "measuring",
+        photo: "",
+        tagline: "Squares for checking perpendicularity",
+        specs: [
+          ["Type", "Precision machinist square set"],
+          ["Use", "Check vise/part squareness, layout"],
+        ],
+        notes:
+          "For checking that a vise, fixture, or part face is truly square before you commit to a cut. Handle by the beam, not the blade edge, and wipe clean before storing.",
+      },
+      {
+        id: "height-gauge-granite",
+        name: "Height Gauge (Vertical Caliper) + Granite Bases",
+        code: "ME-04",
+        icon: "measuring",
+        photo: "",
+        tagline: "Precision height measurement on a granite surface plate",
+        specs: [
+          ["Type", "Vertical (height) caliper"],
+          ["Surface", "Granite surface plate bases ×2"],
+          ["Use", "Height measurement, layout scribing"],
+        ],
+        notes:
+          "A spare height gauge kept with two granite surface-plate bases for a flat, stable reference surface. Keep the granite clean and free of chips — a single embedded chip will throw off every reading taken on it.",
+      },
     ],
     other: [
       {
@@ -289,7 +391,7 @@ const COMMON_MILL_EQUIPMENT = {
         code: "OT-01",
         icon: "measuring",
         photo: "",
-        tagline: "Tormach automatic tool-length setter",
+        tagline: "Tormach auto tool-measuring probe",
         specs: [
           ["Type", "Touch-off tool setter"],
           ["Sets", "Tool length offsets (Z)"],
@@ -309,9 +411,23 @@ const COMMON_MILL_EQUIPMENT = {
    Leave a machine's category as [] if it has nothing beyond the common set.
    ========================================================================== */
 const EQUIPMENT = {
-  /* 770M has nothing beyond the common mill pool right now. */
   "770": {
-    workholding: [],
+    workholding: [
+      {
+        id: "770-smw-jaws-mounted",
+        name: "SMW Jaws (Mounted)",
+        code: "WH-X1",
+        icon: "vise",
+        photo: "",
+        tagline: "Currently-installed jaw set for this machine's SMW Vise",
+        specs: [
+          ["Fits", "SMW Vise"],
+          ["Status", "Mounted on the 770"],
+        ],
+        notes:
+          "The jaw set currently mounted in the 770's SMW Vise. If you swap jaws for a job, put these back on before you leave so the next person's zero isn't thrown off.",
+      },
+    ],
     toolholding: [],
     measuring: [],
     other: [],
@@ -359,6 +475,23 @@ const EQUIPMENT = {
           ["Note", "Requires indicating in"],
         ],
         notes: "Placeholder — each jaw adjusts independently; part must be dial-indicated true before running.",
+      },
+      {
+        id: "8l-5c-collet-set",
+        name: "5C Round Collet Set (35 Pcs.) - Inch",
+        code: "CH-03",
+        icon: "vise",
+        photo: "",
+        tagline: "35-piece 5C round collet set, 1/16\"–1-1/8\"",
+        specs: [
+          ["Range", "1/16\" – 1-1/8\" nominal (1/32\" increments)"],
+          ["Runout", "< .0005 in. TIR"],
+          ["Clamping range", "+0 / -.004 in."],
+          ["Construction", "Precision ground, hardened spring steel"],
+          ["PN", "34727"],
+        ],
+        notes:
+          "Full 35-piece 5C collet set for precise round-stock holding — use with the 5C collet chuck/closer for repeatable, low-runout work. Wipe collets clean before seating; a chip between the collet and stock will throw off both runout and grip. Stored in its wooden case — return each collet to its labeled slot.",
       },
     ],
     toolholding: [
@@ -416,6 +549,35 @@ const EQUIPMENT = {
           ["Use", "Support long / slender turning"],
         ],
         notes: "Placeholder — confirm taper (e.g. MT2/MT3) fitted to the tailstock.",
+      },
+      {
+        id: "8l-micrometer",
+        name: "Micrometer",
+        code: "ME-03",
+        icon: "measuring",
+        photo: "",
+        tagline: "High-precision OD measurement",
+        specs: [
+          ["Reads", "0.0001 in. increments (typical)"],
+          ["Use", "Precise OD checks on turned diameters"],
+        ],
+        notes:
+          "Use for final-precision diameter checks where the digital caliper isn't tight enough — e.g. confirming a press-fit or slip-fit tolerance. Zero it before use and store it in its case, not loose in a drawer.",
+      },
+      {
+        id: "8l-dial-indicator-holder-kit",
+        name: "Dial Indicator Holder Kit",
+        code: "ME-04",
+        icon: "measuring",
+        photo: "",
+        tagline: "Mounting kit for indicating work in the lathe (×2 on hand)",
+        specs: [
+          ["Includes", "Magnetic base / mounting arm"],
+          ["Use", "Mount a dial indicator to check runout/trueness"],
+          ["Qty on hand", "2"],
+        ],
+        notes:
+          "Holds a dial indicator against the spindle, chuck, or tailstock to check runout before you trust a setup — especially after switching to the 4-jaw chuck. Two kits are on hand so you don't have to wait if one's in use.",
       },
     ],
     other: [],
