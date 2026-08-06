@@ -417,7 +417,7 @@ const COMMON_MILL_EQUIPMENT = {
         name: "ETS — Electronic Tool Setter",
         code: "OT-01",
         icon: "measuring",
-        photo: "",
+        photo: "other/ets-tool.webp",
         tagline: "Tormach auto tool-measuring probe",
         specs: [
           ["Type", "Touch-off tool setter"],

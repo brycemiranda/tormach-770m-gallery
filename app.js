@@ -337,7 +337,6 @@ function renderHome(initialQuery) {
       <div class="hero__main">
         <p class="hero__eyebrow">CNC EQUIPMENT CATALOG</p>
         <h1>SELECT<span>MACHINE</span></h1>
-        <p class="hero__sub">Scan the code on any machine, or pick it below, to see everything available for it — workholding, tool holders, cutting tools, and measuring gear.</p>
       </div>
     </header>
     <div class="page">
