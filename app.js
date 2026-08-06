@@ -592,12 +592,11 @@ function renderFlatDetail(machine, category, itemId) {
 /* Optional per-item/family `guide` field: a URL to a tutorial, user guide,
    or how-to video. Renders nothing when absent, so it's fully opt-in. */
 function guideButton(url) {
-  if (!url) return "";
-  return `
-    <a class="guidebtn" href="${escAttr(url)}" target="_blank" rel="noopener noreferrer">
-      <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 4 20 12 6 20 6 4"/></svg>
-      How to Use
-    </a>`;
+  const icon = `<svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 4 20 12 6 20 6 4"/></svg>`;
+  if (!url) {
+    return `<span class="guidebtn guidebtn--off" aria-disabled="true">${icon}How to Use</span>`;
+  }
+  return `<a class="guidebtn" href="${escAttr(url)}" target="_blank" rel="noopener noreferrer">${icon}How to Use</a>`;
 }
 
 function detailPanel(machine, item, categoryLabel) {

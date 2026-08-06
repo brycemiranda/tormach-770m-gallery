@@ -371,6 +371,10 @@ body::before {
 }
 .guidebtn:hover { background: var(--violet-deep); border-color: var(--violet-deep); }
 .guidebtn svg { flex: none; }
+.guidebtn--off {
+  color: var(--muted); background: var(--violet-tint); border-color: var(--line);
+  cursor: default; pointer-events: none;
+}
 .spec { border-top: 1px solid var(--line); margin-bottom: 24px; }
 .spec > div { display: flex; justify-content: space-between; gap: 16px; padding: 11px 0; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 13px; }
 .spec dt { color: var(--muted); letter-spacing: 0.03em; }
