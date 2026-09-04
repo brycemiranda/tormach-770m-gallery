@@ -232,6 +232,29 @@ body::before {
 .mcard__body h2 { font-family: var(--disp); font-weight: 700; font-size: 25px; letter-spacing: -0.01em; color: var(--violet-deep); }
 .mcard__body p { color: var(--muted); font-size: 13.5px; margin-top: 6px; }
 
+/* ---- Coming-soon machine card ------------------------------------------------ */
+.mcard--soon { cursor: default; }
+.mcard--soon:hover { transform: none; border-color: var(--line); box-shadow: 0 1px 2px rgba(32, 21, 48, 0.04); }
+.mcard--soon .mcard__img img { filter: grayscale(60%); opacity: 0.55; }
+.mcard--soon .mcard__body h2,
+.mcard--soon .mcard__body p { color: var(--muted); }
+.mcard__soon-badge {
+  position: absolute; inset: 0; margin: auto; width: fit-content; height: fit-content;
+  font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #fff; background: var(--violet-deep);
+  border-radius: 999px; padding: 8px 18px; white-space: nowrap;
+}
+
+/* ---- Coming-soon detail page -------------------------------------------------- */
+.comingsoon__badge {
+  display: inline-block; font-family: var(--mono); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.14em; text-transform: uppercase; color: #fff; background: var(--violet-deep);
+  border-radius: 999px; padding: 7px 16px; margin-bottom: 14px;
+}
+.comingsoon__specs { margin-top: 18px; }
+.comingsoon__note { color: var(--muted); padding: 40px 0 0; }
+.comingsoon__note a { color: var(--violet); }
+
 /* ---- Category cards (machine hub) ------------------------------------------ */
 .cgrid {
   display: grid; gap: 14px; padding-top: 8px;

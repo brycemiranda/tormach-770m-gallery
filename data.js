@@ -84,6 +84,20 @@ const MACHINES = [
       ["Bed length", "~20\""],
     ],
   },
+  {
+    id: "xstechpro",
+    name: "Tormach xsTECH Pro",
+    type: "mill",
+    code: "MILL-XSTECH",
+    tagline: "Desktop CNC router mill · auto tool changer",
+    photo: "",
+    comingSoon: true,
+    specs: [
+      ["Spindle", "350W, 20,000 RPM max, ISO10/ER11"],
+      ["Work area", "12\" × 9\" × 6.5\""],
+      ["Tool changer", "4-station automatic"],
+    ],
+  },
 ];
 
 /* ---- Category definitions per machine type -------------------------------

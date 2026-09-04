@@ -177,6 +177,7 @@ function searchIndex() {
   if (_searchIndex) return _searchIndex;
   const rows = [];
   MACHINES.forEach((machine) => {
+    if (machine.comingSoon) return; // not available yet — nothing to index
     categoriesFor(machine).forEach((category) => {
       if (category.facets) {
         const facetKeys = category.facets.map((f) => f.key);
@@ -266,7 +267,7 @@ function crumbBar(items) {
 }
 
 function machineSwitcher(currentMachine) {
-  const others = MACHINES.filter((m) => m.id !== currentMachine.id);
+  const others = MACHINES.filter((m) => m.id !== currentMachine.id && !m.comingSoon);
   return `
     <div class="switcher">
       <span class="switcher__label">Switch machine</span>
@@ -301,6 +302,7 @@ function render() {
   if (segs[0] === "m" && segs[1]) {
     const machine = machineById(segs[1]);
     if (!machine) return renderNotFound();
+    if (machine.comingSoon) return renderComingSoon(machine);
 
     if (segs.length === 2) return renderMachineHub(machine);
 
@@ -331,6 +333,23 @@ function renderNotFound() {
     </div>`;
 }
 
+function renderComingSoon(machine) {
+  root.innerHTML = `
+    <div class="page">
+      ${topBar()}
+      ${crumbBar([{ label: "Home", href: "#/" }, { label: machine.name }])}
+      <div class="comingsoon">
+        <span class="comingsoon__badge">Coming Soon</span>
+        <h1 class="h1--cat">${machine.name}</h1>
+        <p class="hero__sub">${machine.tagline}</p>
+        <dl class="goodtoknow__grid comingsoon__specs">
+          ${machine.specs.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join("")}
+        </dl>
+        <p class="comingsoon__note">Not yet available at the makerspace — check back soon. <a href="#/">Back home</a>.</p>
+      </div>
+    </div>`;
+}
+
 function renderHome(initialQuery) {
   root.innerHTML = `
     <header class="hero">
@@ -350,19 +369,22 @@ function renderHome(initialQuery) {
       <div id="home-results"></div>
       <div id="mgrid-wrap">
         <div class="mgrid">
-          ${MACHINES.map(
-            (m, i) => `
-            <a class="mcard" style="--i:${i}" href="#/m/${m.id}">
+          ${MACHINES.map((m, i) => {
+            const tag = m.comingSoon ? "div" : "a";
+            const href = m.comingSoon ? "" : `href="#/m/${m.id}"`;
+            return `
+            <${tag} class="mcard${m.comingSoon ? " mcard--soon" : ""}" style="--i:${i}" ${href}>
               <div class="mcard__img">
                 ${imgTag(m.id, m.photo, m.type, m.name)}
                 <span class="card__code">${m.code}</span>
+                ${m.comingSoon ? `<span class="mcard__soon-badge">Coming Soon</span>` : ""}
               </div>
               <div class="mcard__body">
                 <h2>${m.name}</h2>
                 <p>${m.tagline}</p>
               </div>
-            </a>`
-          ).join("")}
+            </${tag}>`;
+          }).join("")}
         </div>
       </div>
     </div>
